@@ -17,14 +17,14 @@ TypeScript scripts that show how to use each namespace in the Olostep Node SDK.
 npx tsx examples/scrape.ts
 npx tsx examples/batch.ts
 npx tsx examples/crawl.ts
-npx tsx examples/sitemap.ts
+npx tsx examples/map.ts
 npx tsx examples/retrieve.ts <retrieve_id>
 ```
 
 Each script logs the handle returned by the SDK and some representative follow-up calls:
 
 - `scrape.ts` prints the immediate scrape summary and, if a `retrieve_id` is available, calls `client.retrieve()` to fetch fresh content.
-- `batch.ts`, `crawl.ts`, and `sitemap.ts` currently log basic metadata; streaming iterators / wait helpers will be wired up once those APIs land in the SDK.
+- `batch.ts`, `crawl.ts`, and `map.ts` currently log basic metadata; streaming iterators / wait helpers will be wired up once those APIs land in the SDK.
 
 Use these scripts as a starting point for manual smoke tests or for reproducing API issues.
 

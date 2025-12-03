@@ -1,17 +1,17 @@
 import {OlostepTransport} from '../http/transport.js';
 
-interface SitemapHandleData extends Record<string, unknown> {
+interface MapHandleData extends Record<string, unknown> {
   id: string;
   urls?: string[];
 }
 
-export class Sitemap {
+export class Map {
   public readonly id: string;
   private readonly transport: OlostepTransport;
   private readonly urlsList: string[];
   [key: string]: unknown;
 
-  constructor(transport: OlostepTransport, data: SitemapHandleData) {
+  constructor(transport: OlostepTransport, data: MapHandleData) {
     this.transport = transport;
     this.id = data.id;
     this.urlsList = data.urls ?? [];
@@ -30,7 +30,7 @@ export class Sitemap {
   }
 
   async *urls(): AsyncGenerator<string> {
-    // Sitemap URLs are returned immediately in the creation response
+    // Map URLs are returned immediately in the creation response
     for (const url of this.urlsList) {
       yield url;
     }

@@ -1,15 +1,15 @@
 import {OlostepTransport} from '../http/transport.js';
-import {SitemapRequest} from '../types.js';
+import {MapRequest} from '../types.js';
 import {OlostepResource} from './base.js';
-import {Sitemap} from '../client_state/Sitemap.js';
+import {Map} from '../client_state/Map.js';
 
-export interface SitemapResponse extends Record<string, unknown> {
+export interface MapResponse extends Record<string, unknown> {
   id: string;
   urlsCount: number;
   hasMore: boolean;
 }
 
-export class SitemapNamespace extends OlostepResource {
+export class MapNamespace extends OlostepResource {
   constructor(transport: OlostepTransport) {
     super(transport);
   }
@@ -21,8 +21,8 @@ export class SitemapNamespace extends OlostepResource {
     return Array.isArray(value) ? value : [value];
   }
 
-  async create(input: string | SitemapRequest) {
-    const payload: SitemapRequest = typeof input === 'string' ? {url: input} : input;
+  async create(input: string | MapRequest) {
+    const payload: MapRequest = typeof input === 'string' ? {url: input} : input;
     const body = {
       url: payload.url,
       search_query: payload.searchQuery,
@@ -31,12 +31,12 @@ export class SitemapNamespace extends OlostepResource {
       include_urls: this.normalizePatterns(payload.includeUrls),
       exclude_urls: this.normalizePatterns(payload.excludeUrls)
     };
-    const {data} = await this.transport.request<SitemapResponse>({
+    const {data} = await this.transport.request<MapResponse>({
       method: 'POST',
       path: '/maps',
       body
     });
-    return new Sitemap(this.transport, data);
+    return new Map(this.transport, data);
   }
 
   async info(mapId: string) {
@@ -49,11 +49,11 @@ export class SitemapNamespace extends OlostepResource {
 
   // Streamer/iterator not yet implemented
   async *urls(mapId: string) {
-    throw new Error('Streaming sitemap URLs not implemented yet.');
+    throw new Error('Streaming map URLs not implemented yet.');
   }
 
   // Shorthand callable
-  public async call(...args: Parameters<SitemapNamespace['create']>) {
+  public async call(...args: Parameters<MapNamespace['create']>) {
     return this.create(...args);
   }
 }

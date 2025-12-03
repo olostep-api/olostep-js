@@ -1,7 +1,7 @@
 # Olostep Node SDK (preview)
 
 This package is the upcoming official Node.js SDK for the [Olostep web data platform](https://www.olostep.com).  
-It mirrors the ergonomics of the Python SDK described in the repository root README: discoverable namespaces, async-first design, stateful return objects, and rich helpers for batches, crawls, sitemaps, and retrieval.
+It mirrors the ergonomics of the Python SDK described in the repository root README: discoverable namespaces, async-first design, stateful return objects, and rich helpers for batches, crawls, maps, and retrieval.
 
 > **Status**: Work in progress. The scaffolding is in place, but the HTTP workflows and iterators are still TODOs.
 
@@ -18,12 +18,212 @@ const client = new OlostepClient({apiKey: process.env.OLOSTEP_API_KEY});
 
 // Minimal scrape example
 const result = await client.scrapes('https://example.com');
-console.log(result.id, result.available);
+console.log(result.id, result.html_content);
+```
+
+## Usage
+
+### Scraping
+
+Scrape a single URL with various options:
+
+```ts
+import {OlostepClient, Format} from 'olostep';
+
+const client = new OlostepClient({apiKey: 'your_api_key'});
+
+// Simple scrape
+const scrape = await client.scrapes('https://example.com');
+
+// With multiple formats
+const scrape = await client.scrapes({
+  url: 'https://example.com',
+  formats: [Format.HTML, Format.MARKDOWN, Format.TEXT],
+  waitBeforeScraping: 1000,
+  removeImages: true
+});
+
+// Access the content
+console.log(scrape.html_content);
+console.log(scrape.markdown_content);
+
+// Get scrape by ID
+const fetched = await client.scrapes.get(scrape.id);
+```
+
+### Batch Processing
+
+Process multiple URLs in a single batch:
+
+```ts
+// Using URL strings (custom IDs auto-generated)
+const batch = await client.batches([
+  'https://example.com',
+  'https://example.org',
+  'https://example.net'
+]);
+
+// Or with explicit custom IDs
+const batch = await client.batches([
+  {url: 'https://example.com', customId: 'site-1'},
+  {url: 'https://example.org', customId: 'site-2'}
+]);
+
+console.log(`Batch ${batch.id} created with ${batch.total_urls} URLs`);
+
+// Wait for completion
+await batch.waitTillDone({
+  checkEveryNSecs: 5,
+  timeoutSeconds: 120
+});
+
+// Get batch info
+const info = await batch.info();
+console.log(info);
+
+// Stream individual results
+for await (const item of batch.items()) {
+  console.log(item.customId, item.status);
+}
+```
+
+### Crawling
+
+Crawl an entire website:
+
+```ts
+const crawl = await client.crawls({
+  url: 'https://example.com',
+  maxPages: 100,
+  maxDepth: 3,
+  includeUrls: ['*/blog/*'],
+  excludeUrls: ['*/admin/*']
+});
+
+console.log(`Crawl ${crawl.id} started`);
+
+// Wait for completion
+await crawl.waitTillDone({
+  checkEveryNSecs: 10,
+  timeoutSeconds: 300
+});
+
+// Get crawl info
+const info = await crawl.info();
+console.log(`Crawled ${info.pages_crawled} pages`);
+
+// Stream crawled pages
+for await (const page of crawl.pages()) {
+  console.log(page.url, page.status_code);
+}
+```
+
+### Site Mapping
+
+Generate a sitemap of URLs from a website:
+
+```ts
+const map = await client.maps({
+  url: 'https://example.com',
+  topN: 100,
+  includeSubdomain: true,
+  searchQuery: 'blog posts'
+});
+
+console.log(`Map ${map.id} created`);
+
+// Stream URLs
+for await (const url of map.urls()) {
+  console.log(url);
+}
+
+// Get map info
+const info = await map.info();
+```
+
+### Content Retrieval
+
+Retrieve previously scraped content:
+
+```ts
+// Get content in specific format(s)
+const content = await client.retrieves(retrieveId, Format.MARKDOWN);
+console.log(content.markdown_content);
+
+// Multiple formats
+const content = await client.retrieves(retrieveId, [
+  Format.HTML,
+  Format.MARKDOWN
+]);
+```
+
+### Advanced Options
+
+#### Custom Actions
+
+Perform browser actions before scraping:
+
+```ts
+const scrape = await client.scrapes({
+  url: 'https://example.com',
+  actions: [
+    {type: 'wait', milliseconds: 2000},
+    {type: 'click', selector: '#load-more'},
+    {type: 'scroll', distance: 1000},
+    {type: 'fill_input', selector: '#search', value: 'query'}
+  ]
+});
+```
+
+#### Geographic Location
+
+Scrape from different countries:
+
+```ts
+import {Country} from 'olostep';
+
+const scrape = await client.scrapes({
+  url: 'https://example.com',
+  country: Country.DE  // Germany
+});
+```
+
+#### LLM Extraction
+
+Extract structured data using LLMs:
+
+```ts
+const scrape = await client.scrapes({
+  url: 'https://example.com',
+  llmExtract: {
+    schema: JSON.stringify({
+      title: 'string',
+      price: 'number',
+      description: 'string'
+    }),
+    model: 'gpt-4'
+  }
+});
+```
+
+### Client Configuration
+
+```ts
+const client = new OlostepClient({
+  apiKey: 'your_api_key',
+  apiBaseUrl: 'https://api.olostep.com/v1',  // optional
+  timeoutMs: 150000,  // 150 seconds (optional)
+  retry: {
+    maxRetries: 3,
+    initialDelayMs: 1000
+  },
+  userAgent: 'MyApp/1.0'  // optional
+});
 ```
 
 ### Feature highlights
 
-- Async-first client with an opt-in sync facade (mirrors the Python SDK contract).
+- Async-first client with full TypeScript support.
 - Type-safe inputs using TypeScript enums and interfaces (Formats, Countries, Actions, etc.).
 - Rich resource namespaces with both shorthand calls (`client.scrapes()`) and explicit methods (`client.scrapes.create()`).
 - Shared transport layer with retries, timeouts, and JSON decoding.
@@ -38,7 +238,7 @@ olostep/
 │  ├─ config.ts              # Option resolution & defaults
 │  ├─ errors.ts              # Exception hierarchy
 │  ├─ http/transport.ts      # Fetch-based HTTP transport with retries
-│  ├─ resources/             # Namespaces (scrape, batch, crawl, sitemap, retrieve)
+│  ├─ resources/             # Namespaces (scrape, batch, crawl, map, retrieve)
 │  └─ types.ts               # Shared enums and DTOs
 ├─ package.json              # NPM metadata + scripts
 ├─ tsconfig*.json            # TypeScript build configs
@@ -67,7 +267,7 @@ Then run the examples:
 npx tsx examples/scrape.ts
 npx tsx examples/batch.ts
 npx tsx examples/crawl.ts
-npx tsx examples/sitemap.ts
+npx tsx examples/map.ts
 npx tsx examples/retrieve.ts <retrieve_id>
 ```
 

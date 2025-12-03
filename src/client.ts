@@ -4,8 +4,8 @@ import {BatchNamespace} from './resources/batch.js';
 import {CrawlNamespace} from './resources/crawl.js';
 import {RetrieveNamespace} from './resources/retrieve.js';
 import {ScrapeNamespace} from './resources/scrape.js';
-import {SitemapNamespace} from './resources/sitemap.js';
-import {BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, SitemapRequest} from './types.js';
+import {MapNamespace} from './resources/map.js';
+import {BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, MapRequest} from './types.js';
 
 type NamespaceShorthand<
   TNamespace extends object,
@@ -54,7 +54,7 @@ export class OlostepClient {
   public readonly scrapes: NamespaceShorthand<ScrapeNamespace, 'create', ScrapeNamespace['create']>;
   public readonly batches: NamespaceShorthand<BatchNamespace, 'start', BatchNamespace['start']>;
   public readonly crawls: NamespaceShorthand<CrawlNamespace, 'start', CrawlNamespace['start']>;
-  public readonly sitemaps: NamespaceShorthand<SitemapNamespace, 'create', SitemapNamespace['create']>;
+  public readonly maps: NamespaceShorthand<MapNamespace, 'create', MapNamespace['create']>;
   public readonly retrieves: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
 
   constructor(options?: OlostepClientOptions) {
@@ -71,7 +71,7 @@ export class OlostepClient {
     this.scrapes = attachShorthand(new ScrapeNamespace(this.transport), 'create');
     this.batches = attachShorthand(new BatchNamespace(this.transport), 'start');
     this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'start');
-    this.sitemaps = attachShorthand(new SitemapNamespace(this.transport), 'create');
+    this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
     this.retrieves = attachShorthand(new RetrieveNamespace(this.transport), 'get');
   }
 
@@ -87,40 +87,11 @@ export class OlostepClient {
     return this.crawls(input);
   }
 
-  async sitemapSite(input: string | SitemapRequest) {
-    return this.sitemaps(input);
+  async mapSite(input: string | MapRequest) {
+    return this.maps(input);
   }
 
   async retrieveContent(retrieveId: string, formats?: Format | Format[]) {
     return this.retrieves(retrieveId, formats);
   }
 }
-
-export class SyncOlostepClient {
-  private readonly client: OlostepClient;
-
-  constructor(options?: OlostepClientOptions) {
-    this.client = new OlostepClient(options);
-  }
-
-  scrape(input: string | ScrapeRequest) {
-    return this.client.scrapes(input);
-  }
-
-  batch(input: string | string[] | BatchItem[], options?: BatchRequestOptions) {
-    return this.client.batches(input, options);
-  }
-
-  crawl(input: string | CrawlRequest) {
-    return this.client.crawls(input);
-  }
-
-  sitemap(input: string | SitemapRequest) {
-    return this.client.sitemaps(input);
-  }
-
-  retrieve(retrieveId: string, formats?: Format | Format[]) {
-    return this.client.retrieves(retrieveId, formats);
-  }
-}
-

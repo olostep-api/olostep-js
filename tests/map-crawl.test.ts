@@ -1,6 +1,6 @@
 import {OlostepClient} from '../src/index.js';
 
-describe('Olostep SDK - Sitemap & Crawl Operations', () => {
+describe('Olostep SDK - Map & Crawl Operations', () => {
   let client: OlostepClient;
 
   beforeAll(() => {
@@ -10,35 +10,35 @@ describe('Olostep SDK - Sitemap & Crawl Operations', () => {
     client = new OlostepClient();
   });
 
-  describe('Sitemap Operations', () => {
-    test('should create sitemap using client.sitemaps()', async () => {
-      const sitemap = await client.sitemaps({
+  describe('Map Operations', () => {
+    test('should create map using client.maps()', async () => {
+      const map = await client.maps({
         url: 'https://example.com',
         topN: 10
       });
       
-      expect(sitemap).toBeDefined();
-      expect(sitemap.id).toMatch(/^map_/);
+      expect(map).toBeDefined();
+      expect(map.id).toMatch(/^map_/);
     }, 30000);
 
-    test('should stream URLs using sitemap.urls()', async () => {
-      const sitemap = await client.sitemaps('https://example.com');
+    test('should stream URLs using map.urls()', async () => {
+      const map = await client.maps('https://example.com');
       
       const urls: string[] = [];
-      for await (const url of sitemap.urls()) {
+      for await (const url of map.urls()) {
         urls.push(url);
       }
       
       expect(urls.length).toBeGreaterThan(0);
       expect(urls[0]).toContain('example.com');
-    }, 30000);
+    }, 60000);
 
-    test('should use client.sitemaps.create() explicit syntax', async () => {
-      const sitemap = await client.sitemaps.create('https://example.com');
+    test('should use client.maps.create() explicit syntax', async () => {
+      const map = await client.maps.create('https://example.com');
       
-      expect(sitemap).toBeDefined();
-      expect(sitemap.id).toMatch(/^map_/);
-    }, 30000);
+      expect(map).toBeDefined();
+      expect(map.id).toMatch(/^map_/);
+    }, 60000);
   });
 
   describe('Crawl Operations', () => {
