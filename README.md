@@ -8,11 +8,11 @@ It mirrors the ergonomics of the Python SDK described in the repository root REA
 ## Getting started
 
 ```bash
-npm install olostep-node
+npm install olostep
 ```
 
 ```ts
-import {OlostepClient} from 'olostep-node';
+import {OlostepClient} from 'olostep';
 
 const client = new OlostepClient({apiKey: process.env.OLOSTEP_API_KEY});
 
@@ -32,7 +32,7 @@ console.log(result.id, result.available);
 ## Project structure
 
 ```
-olostep-node/
+olostep/
 ├─ src/
 │  ├─ client.ts              # Client + facade wiring
 │  ├─ config.ts              # Option resolution & defaults
