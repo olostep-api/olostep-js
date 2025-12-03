@@ -1,0 +1,54 @@
+{
+  "name": "olostep-node",
+  "version": "0.1.0",
+  "description": "Node.js SDK for the Olostep web data platform.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
+    "check:types": "tsc --noEmit",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+  },
+  "keywords": [
+    "olostep",
+    "sdk",
+    "scraping",
+    "web",
+    "crawler",
+    "api-client",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olostep/olostep-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/olostep/olostep-node/issues"
+  },
+  "homepage": "https://www.olostep.com",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "jest": "^30.2.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.4.0"
+  }
+}
