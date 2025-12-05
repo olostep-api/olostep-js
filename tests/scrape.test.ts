@@ -1,24 +1,24 @@
-import {OlostepClient} from '../src/index.js';
+import Olostep from '../src/index.js';
 import {Format} from '../src/types.js';
 
 describe('Olostep SDK - Scrape Operations', () => {
-  let client: OlostepClient;
+  let client: Olostep;
 
   beforeAll(() => {
     if (!process.env.OLOSTEP_API_KEY) {
       throw new Error('OLOSTEP_API_KEY environment variable is required for tests');
     }
-    client = new OlostepClient();
+    client = new Olostep();
   });
 
   describe('Client Initialization', () => {
     test('should create client with environment variable', () => {
-      const testClient = new OlostepClient();
+      const testClient = new Olostep();
       expect(testClient).toBeDefined();
     });
 
     test('should create client with API key passed directly', () => {
-      const testClient = new OlostepClient({
+      const testClient = new Olostep({
         apiKey: process.env.OLOSTEP_API_KEY
       });
       expect(testClient).toBeDefined();
@@ -28,7 +28,7 @@ describe('Olostep SDK - Scrape Operations', () => {
       const oldApiKey = process.env.OLOSTEP_API_KEY;
       delete process.env.OLOSTEP_API_KEY;
       
-      expect(() => new OlostepClient()).toThrow('No API key provided');
+      expect(() => new Olostep()).toThrow('No API key provided');
       
       process.env.OLOSTEP_API_KEY = oldApiKey;
     });

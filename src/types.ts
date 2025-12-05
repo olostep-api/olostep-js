@@ -108,7 +108,7 @@ export interface CrawlRequest {
   webhookUrl?: string;
 }
 
-export interface SitemapRequest {
+export interface MapRequest {
   url: string;
   searchQuery?: string;
   topN?: number;
@@ -126,7 +126,7 @@ export type RequestPayload =
   | ScrapeRequest
   | BatchItem[]
   | CrawlRequest
-  | SitemapRequest
+  | MapRequest
   | RetrieveRequest;
 
 export interface PaginatedIteratorConfig<T> {

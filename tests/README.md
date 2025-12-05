@@ -48,9 +48,9 @@ Tests batch processing including:
 - Batch info retrieval
 - `waitTillDone()` functionality with timeouts
 
-### `sitemap-crawl.test.ts`
-Tests sitemap and crawl operations including:
-- Sitemap creation and URL streaming with `sitemap.urls()`
+### `map-crawl.test.ts`
+Tests map and crawl operations including:
+- Map creation and URL streaming with `map.urls()`
 - Crawl creation and info retrieval
 - Shorthand and explicit syntax for both
 
@@ -68,6 +68,6 @@ The tests cover:
 - ✅ All shorthand syntax (`client.scrape()`, `client.batch()`, etc.)
 - ✅ All explicit syntax (`client.scrape.create()`, `client.batch.start()`, etc.)
 - ✅ Batch `waitTillDone()` with timeout handling
-- ✅ Sitemap URL streaming with async iterators
+- ✅ Map URL streaming with async iterators
 - ✅ Error handling for missing API keys
 - ✅ Auto-generation of customIds for batch operations

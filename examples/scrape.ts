@@ -1,13 +1,13 @@
 import {Format} from '../src/types.js';
-import {OlostepClient} from '../src/index.js';
+import Olostep from '../src/index.js';
 import {logJSON} from './helpers.js';
 
 async function main() {
   console.log('=== Scrape Examples ===\n');
 
   // Create client (reads from OLOSTEP_API_KEY env variable)
-  // You can also pass API key directly: new OlostepClient({ apiKey: 'olostep_xxx...' })
-  const client = new OlostepClient();
+  // You can also pass API key directly: new Olostep({ apiKey: 'olostep_xxx...' })
+  const client = new Olostep();
 
   // Syntax 1: Direct shorthand call
   console.log('1. Using client.scrapes() - shorthand syntax\n');

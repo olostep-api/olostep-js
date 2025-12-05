@@ -1,10 +1,10 @@
-import {OlostepClient} from '../src/index.js';
+import Olostep from '../src/index.js';
 import {logJSON} from './helpers.js';
 
 async function main() {
   console.log('=== Crawl Examples ===\n');
 
-  const client = new OlostepClient();
+  const client = new Olostep();
 
   // Syntax 1: Direct shorthand call (also works: client.crawls.start())
   console.log('1. Using client.crawls() - shorthand syntax\n');

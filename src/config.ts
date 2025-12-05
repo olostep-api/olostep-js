@@ -23,7 +23,7 @@ const envTimeout = Number(process.env.OLOSTEP_API_TIMEOUT);
 export const DEFAULT_TIMEOUT_MS = Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout * 1000 : 150_000;
 
 export const DEFAULT_USER_AGENT =
-  process.env.OLOSTEP_USER_AGENT ?? `olostep-node-sdk/${SDK_VERSION}`;
+  process.env.OLOSTEP_USER_AGENT ?? `olostep-sdk/${SDK_VERSION}`;
 
 export const DEFAULT_LOG_PATH = process.env.OLOSTEP_IO_LOG_PATH ?? null;
 

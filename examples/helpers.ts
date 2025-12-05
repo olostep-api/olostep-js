@@ -1,4 +1,4 @@
-import {OlostepClient, OlostepClientOptions} from '../src/index.js';
+import Olostep, {OlostepClientOptions} from '../src/index.js';
 
 const parseTimeoutMs = (value?: string) => {
   if (!value) {
@@ -20,7 +20,7 @@ export const createClient = (options?: OlostepClientOptions) => {
     timeoutMs: parseTimeoutMs(process.env.OLOSTEP_API_TIMEOUT)
   };
 
-  return new OlostepClient({
+  return new Olostep({
     apiKey,
     ...envOverrides,
     ...options

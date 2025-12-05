@@ -1,10 +1,10 @@
-import {OlostepClient} from '../src/index.js';
+import Olostep from '../src/index.js';
 import {logJSON} from './helpers.js';
 
 async function main() {
   console.log('=== Batch Processing Examples ===\n');
 
-  const client = new OlostepClient();
+  const client = new Olostep();
 
   // Syntax 1: Direct shorthand call
   console.log('1. Using client.batches() - shorthand syntax\n');

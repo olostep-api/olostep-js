@@ -1,5 +1,5 @@
 {
-  "name": "olostep-node",
+  "name": "olostep",
   "version": "0.1.0",
   "description": "Node.js SDK for the Olostep web data platform.",
   "license": "MIT",
@@ -28,10 +28,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/olostep/olostep-node.git"
+    "url": "https://github.com/olostep-api/olostep-js.git"
   },
   "bugs": {
-    "url": "https://github.com/olostep/olostep-node/issues"
+    "url": "https://github.com/olostep-api/olostep-js/issues"
   },
   "homepage": "https://www.olostep.com",
   "engines": {

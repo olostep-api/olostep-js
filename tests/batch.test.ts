@@ -1,13 +1,13 @@
-import {OlostepClient} from '../src/index.js';
+import Olostep from '../src/index.js';
 
 describe('Olostep SDK - Batch Operations', () => {
-  let client: OlostepClient;
+  let client: Olostep;
 
   beforeAll(() => {
     if (!process.env.OLOSTEP_API_KEY) {
       throw new Error('OLOSTEP_API_KEY environment variable is required for tests');
     }
-    client = new OlostepClient();
+    client = new Olostep();
   });
 
   describe('Batch - Shorthand Syntax', () => {
