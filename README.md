@@ -1,9 +1,6 @@
 # Olostep Node SDK (preview)
 
-This package is the upcoming official Node.js SDK for the [Olostep web data platform](https://www.olostep.com).  
-It mirrors the ergonomics of the Python SDK described in the repository root README: discoverable namespaces, async-first design, stateful return objects, and rich helpers for batches, crawls, maps, and retrieval.
-
-> **Status**: Work in progress. The scaffolding is in place, but the HTTP workflows and iterators are still TODOs.
+This package is the official Node.js SDK for the [Olostep web data platform](https://www.olostep.com).  
 
 ## Getting started
 
