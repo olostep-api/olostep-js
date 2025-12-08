@@ -17,7 +17,7 @@ import Olostep from 'olostep';
 const client = new Olostep({apiKey: process.env.OLOSTEP_API_KEY});
 
 // Minimal scrape example
-const result = await client.scrapes('https://example.com');
+const result = await client.scrapes.create('https://example.com');
 console.log(result.id, result.html_content);
 ```
 
@@ -33,10 +33,10 @@ import Olostep, {Format} from 'olostep';
 const client = new Olostep({apiKey: 'your_api_key'});
 
 // Simple scrape
-const scrape = await client.scrapes('https://example.com');
+const scrape = await client.scrapes.create('https://example.com');
 
 // With multiple formats
-const scrape = await client.scrapes({
+const scrape = await client.scrapes.create({
   url: 'https://example.com',
   formats: [Format.HTML, Format.MARKDOWN, Format.TEXT],
   waitBeforeScraping: 1000,
@@ -147,11 +147,14 @@ Retrieve previously scraped content:
 
 ```ts
 // Get content in specific format(s)
-const content = await client.retrieves(retrieveId, Format.MARKDOWN);
+const content = await client.retrieve(retrieveId, Format.MARKDOWN);
 console.log(content.markdown_content);
 
 // Multiple formats
-const content = await client.retrieves(retrieveId, [
+const content = await client.retrieve(retrieveId, [
+  Format.HTML,
+  Format.MARKDOWN
+]);
   Format.HTML,
   Format.MARKDOWN
 ]);
@@ -164,7 +167,7 @@ const content = await client.retrieves(retrieveId, [
 Perform browser actions before scraping:
 
 ```ts
-const scrape = await client.scrapes({
+const scrape = await client.scrapes.create({
   url: 'https://example.com',
   actions: [
     {type: 'wait', milliseconds: 2000},
@@ -177,16 +180,23 @@ const scrape = await client.scrapes({
 
 #### Geographic Location
 
-Scrape from different countries:
+Scrape from different countries using predefined country codes or any valid country code string:
 
 ```ts
 import Olostep, {Country} from 'olostep';
 
 const client = new Olostep({apiKey: 'your_api_key'});
 
-const scrape = await client.scrapes({
+// Using predefined enum values (US, DE, FR, GB, SG)
+const scrape = await client.scrapes.create({
   url: 'https://example.com',
   country: Country.DE  // Germany
+});
+
+// Or use any valid country code as a string
+const scrape2 = await client.scrapes.create({
+  url: 'https://example.com',
+  country: 'jp'  // Japan
 });
 ```
 
@@ -195,15 +205,16 @@ const scrape = await client.scrapes({
 Extract structured data using LLMs:
 
 ```ts
-const scrape = await client.scrapes({
+const scrape = await client.scrapes.create({
   url: 'https://example.com',
   llmExtract: {
     schema: JSON.stringify({
       title: 'string',
       price: 'number',
       description: 'string'
-    }),
-    model: 'gpt-4'
+    })
+    // Optionally provide a prompt to guide extraction
+    // prompt: 'Extract product information from this page'
   }
 });
 ```
@@ -229,7 +240,7 @@ const client = new Olostep({
 
 - Async-first client with full TypeScript support.
 - Type-safe inputs using TypeScript enums and interfaces (Formats, Countries, Actions, etc.).
-- Rich resource namespaces with both shorthand calls (`client.scrapes()`) and explicit methods (`client.scrapes.create()`).
+- Rich resource namespaces with both shorthand calls (`client.scrapes.create()`) and explicit methods (`client.scrapes.get()`).
 - Shared transport layer with retries, timeouts, and JSON decoding.
 - Comprehensive error hierarchy aligned with the Python SDK.
 

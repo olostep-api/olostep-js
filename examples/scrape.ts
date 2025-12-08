@@ -10,8 +10,8 @@ async function main() {
   const client = new Olostep();
 
   // Syntax 1: Direct shorthand call
-  console.log('1. Using client.scrapes() - shorthand syntax\n');
-  const scrape = await client.scrapes({
+  console.log('1. Using client.scrapes.create() - shorthand syntax\n');
+  const scrape = await client.scrapes.create({
     url: 'https://example.com',
     formats: [Format.HTML, Format.MARKDOWN],
     waitBeforeScraping: 1000
@@ -35,8 +35,8 @@ async function main() {
   console.log(`Retrieved scrape: ${fetched.id}`);
 
   if (scrape.retrieve_id) {
-    console.log('\n4. Using client.retrieves() to get content\n');
-    const retrieved = await client.retrieves(scrape.retrieve_id, Format.HTML);
+    console.log('\n4. Using client.retrieve() to get content\n');
+    const retrieved = await client.retrieve(scrape.retrieve_id, Format.HTML);
     logJSON('Retrieved content', {
       htmlBytes: retrieved.html_content?.length ?? 0,
       availableFields: Object.keys(retrieved).filter((key) => key.endsWith('_content'))

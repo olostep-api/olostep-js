@@ -11,7 +11,7 @@ async function main() {
 
   const client = createClient();
 
-  const result = await client.retrieves(retrieveId, [Format.HTML, Format.JSON]);
+  const result = await client.retrieve(retrieveId, [Format.HTML, Format.JSON]);
   logJSON('Retrieve result', result);
 }
 

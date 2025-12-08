@@ -27,8 +27,8 @@ export interface ScreenSize {
 }
 
 export interface LLMExtractOptions {
-  schema: string;
-  model?: string;
+  schema?: string;
+  prompt?: string;
 }
 
 export interface LinksOnPageOptions {
