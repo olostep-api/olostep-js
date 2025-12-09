@@ -35,8 +35,8 @@ describe('Olostep SDK - Scrape Operations', () => {
   });
 
   describe('Scrape - Shorthand Syntax', () => {
-    test('should scrape URL using client.scrapes()', async () => {
-      const result = await client.scrapes('https://example.com');
+    test('should scrape URL using client.scrapes.create()', async () => {
+      const result = await client.scrapes.create('https://example.com');
       
       expect(result).toBeDefined();
       expect(result.id).toMatch(/^scrape_/);
@@ -44,7 +44,7 @@ describe('Olostep SDK - Scrape Operations', () => {
     }, 30000);
 
     test('should scrape with formats parameter', async () => {
-      const result = await client.scrapes({
+      const result = await client.scrapes.create({
         url: 'https://example.com',
         formats: [Format.HTML, Format.MARKDOWN]
       });
@@ -73,23 +73,23 @@ describe('Olostep SDK - Scrape Operations', () => {
 
   describe('Retrieve Operations', () => {
     test('should retrieve content by ID', async () => {
-      const scrape = await client.scrapes({
+      const scrape = await client.scrapes.create({
         url: 'https://example.com',
         formats: [Format.HTML]
       });
       
       if (scrape.retrieve_id) {
-        const retrieved = await client.retrieves(scrape.retrieve_id, Format.HTML);
+        const retrieved = await client.retrieve(scrape.retrieve_id, Format.HTML);
         expect(retrieved).toBeDefined();
         expect(retrieved.html_content).toBeDefined();
       }
     }, 30000);
 
-    test('should use client.retrieves.get() explicit syntax', async () => {
-      const scrape = await client.scrapes('https://example.com');
+    test('should use client.retrieve.get() explicit syntax', async () => {
+      const scrape = await client.scrapes.create('https://example.com');
       
       if (scrape.retrieve_id) {
-        const retrieved = await client.retrieves.get(scrape.retrieve_id);
+        const retrieved = await client.retrieve.get(scrape.retrieve_id);
         expect(retrieved).toBeDefined();
       }
     }, 30000);

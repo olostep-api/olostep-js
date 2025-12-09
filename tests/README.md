@@ -37,8 +37,8 @@ npx jest --coverage
 ### `scrape.test.ts`
 Tests scraping operations including:
 - Client initialization (env variable and direct API key)
-- Shorthand syntax (`client.scrape()`)
-- Explicit syntax (`client.scrape.create()`, `client.scrape.get()`)
+- Shorthand syntax (`client.scrapes.create()`)
+- Explicit syntax (`client.scrapes.get()`)
 - Content retrieval operations
 
 ### `batch.test.ts`
@@ -65,8 +65,8 @@ Tests map and crawl operations including:
 
 The tests cover:
 - ✅ Client initialization (env var + direct API key)
-- ✅ All shorthand syntax (`client.scrape()`, `client.batch()`, etc.)
-- ✅ All explicit syntax (`client.scrape.create()`, `client.batch.start()`, etc.)
+- ✅ All shorthand syntax (`client.scrapes.create()`, `client.batches.start()`, etc.)
+- ✅ All explicit syntax (`client.scrapes.get()`, `client.batches.info()`, etc.)
 - ✅ Batch `waitTillDone()` with timeout handling
 - ✅ Map URL streaming with async iterators
 - ✅ Error handling for missing API keys

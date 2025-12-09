@@ -55,7 +55,7 @@ export default class Olostep {
   public readonly batches: NamespaceShorthand<BatchNamespace, 'start', BatchNamespace['start']>;
   public readonly crawls: NamespaceShorthand<CrawlNamespace, 'start', CrawlNamespace['start']>;
   public readonly maps: NamespaceShorthand<MapNamespace, 'create', MapNamespace['create']>;
-  public readonly retrieves: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
+  public readonly retrieve: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
 
   constructor(options?: OlostepClientOptions) {
     const resolved = resolveClientOptions(options);
@@ -72,7 +72,7 @@ export default class Olostep {
     this.batches = attachShorthand(new BatchNamespace(this.transport), 'start');
     this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'start');
     this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
-    this.retrieves = attachShorthand(new RetrieveNamespace(this.transport), 'get');
+    this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');
   }
 
   async scrapeUrl(input: string | ScrapeRequest) {
@@ -92,6 +92,6 @@ export default class Olostep {
   }
 
   async retrieveContent(retrieveId: string, formats?: Format | Format[]) {
-    return this.retrieves(retrieveId, formats);
+    return this.retrieve(retrieveId, formats);
   }
 }
