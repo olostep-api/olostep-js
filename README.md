@@ -282,9 +282,3 @@ npx tsx examples/retrieve.ts <retrieve_id>
 
 They exercise each namespace using the current SDK surface and are a quick way to verify changes manually.
 
-## Next steps
-
-1. Flesh out the remaining TODOs (iterators, wait helpers, response typing).
-2. Port validation and coercion logic from the Python SDK.
-3. Add comprehensive tests (unit + integration).
-4. Wire up CI and publish to npm.
