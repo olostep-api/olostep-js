@@ -65,7 +65,7 @@ Tests map and crawl operations including:
 
 The tests cover:
 - ✅ Client initialization (env var + direct API key)
-- ✅ All shorthand syntax (`client.scrapes.create()`, `client.batches.start()`, etc.)
+- ✅ All shorthand syntax (`client.scrapes.create()`, `client.batches.create()`, etc.)
 - ✅ All explicit syntax (`client.scrapes.get()`, `client.batches.info()`, etc.)
 - ✅ Batch `waitTillDone()` with timeout handling
 - ✅ Map URL streaming with async iterators

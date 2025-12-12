@@ -15,8 +15,8 @@ async function main() {
   console.log(`Batch created: ${batch1.id} (${batch1.total_urls} URLs)`);
 
   // Syntax 2: Explicit method call (also works)
-  console.log('\n2. Using client.batches.start() - explicit syntax\n');
-  const batch2 = await client.batches.start([
+  console.log('\n2. Using client.batches.create() - explicit syntax\n');
+  const batch2 = await client.batches.create([
     { url: 'https://example.net', customId: 'example-net' }
   ]);
   console.log(`Batch created: ${batch2.id}`);

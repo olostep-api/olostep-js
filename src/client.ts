@@ -52,8 +52,8 @@ export default class Olostep {
   private readonly transport: OlostepTransport;
 
   public readonly scrapes: NamespaceShorthand<ScrapeNamespace, 'create', ScrapeNamespace['create']>;
-  public readonly batches: NamespaceShorthand<BatchNamespace, 'start', BatchNamespace['start']>;
-  public readonly crawls: NamespaceShorthand<CrawlNamespace, 'start', CrawlNamespace['start']>;
+  public readonly batches: NamespaceShorthand<BatchNamespace, 'create', BatchNamespace['create']>;
+  public readonly crawls: NamespaceShorthand<CrawlNamespace, 'create', CrawlNamespace['create']>;
   public readonly maps: NamespaceShorthand<MapNamespace, 'create', MapNamespace['create']>;
   public readonly retrieve: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
 
@@ -69,7 +69,7 @@ export default class Olostep {
     );
 
     this.scrapes = attachShorthand(new ScrapeNamespace(this.transport), 'create');
-    this.batches = attachShorthand(new BatchNamespace(this.transport), 'start');
+    this.batches = attachShorthand(new BatchNamespace(this.transport), 'create');
     this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'start');
     this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
     this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');

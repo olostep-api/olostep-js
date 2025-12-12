@@ -35,8 +35,8 @@ describe('Olostep SDK - Batch Operations', () => {
   });
 
   describe('Batch - Explicit Syntax', () => {
-    test('should create batch using client.batches.start()', async () => {
-      const batch = await client.batches.start([
+    test('should create batch using client.batches.create()', async () => {
+      const batch = await client.batches.create([
         {url: 'https://example.com', customId: 'explicit-test-1'}
       ]);
       

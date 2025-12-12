@@ -79,7 +79,7 @@ export class BatchNamespace extends OlostepResource {
     super(transport);
   }
 
-  async start(input: string | string[] | BatchItemType[], options?: BatchRequestOptions) {
+  async create(input: string | string[] | BatchItemType[], options?: BatchRequestOptions) {
     const items = toApiBatchItems(normalizeBatchInput(input));
     const {data} = await this.transport.request<BatchResponse>({
       method: 'POST',
@@ -144,8 +144,8 @@ export class BatchNamespace extends OlostepResource {
   }
 
   // Shorthand callable
-  public async call(...args: Parameters<BatchNamespace['start']>) {
-    return this.start(...args);
+  public async call(...args: Parameters<BatchNamespace['create']>) {
+    return this.create(...args);
   }
 }
 
