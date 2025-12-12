@@ -3,7 +3,7 @@ import {createClient, logJSON} from './helpers.js';
 async function main() {
   const client = createClient();
 
-  const map = await client.maps({
+  const map = await client.maps.create({
     url: 'https://example.com',
     topN: 50
   });
