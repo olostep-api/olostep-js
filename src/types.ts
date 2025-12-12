@@ -27,7 +27,7 @@ export interface ScreenSize {
 }
 
 export interface LLMExtractOptions {
-  schema?: string;
+  schema?: Record<string, unknown> | string;
   prompt?: string;
 }
 

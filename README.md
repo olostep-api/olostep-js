@@ -202,13 +202,13 @@ Extract structured data using LLMs:
 const scrape = await client.scrapes.create({
   url: 'https://example.com',
   llmExtract: {
-    schema: JSON.stringify({
+    schema: {
       title: 'string',
       price: 'number',
       description: 'string'
-    })
+    },
     // Optionally provide a prompt to guide extraction
-    // prompt: 'Extract product information from this page'
+    prompt: 'Extract product information from this page'
   }
 });
 ```

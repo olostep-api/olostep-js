@@ -47,6 +47,15 @@ const toLinksOnPagePayload = (links?: LinksOnPageOptions) => {
     exclude_links: links.excludeLinks
   };
 };
+const toLLMExtractPayload = (llmExtract?: {schema?: Record<string, unknown> | string; prompt?: string}) => {
+  if (!llmExtract) {
+    return undefined;
+  }
+  return {
+    schema: llmExtract.schema,
+    prompt: llmExtract.prompt
+  };
+};
 const normalizeScrapeInput = (input: string | ScrapeRequest): ScrapeRequest =>
   typeof input === 'string' ? {url: input} : input;
 const buildScrapePayload = (input: ScrapeRequest) => ({
@@ -60,7 +69,7 @@ const buildScrapePayload = (input: ScrapeRequest) => ({
   remove_images: input.removeImages,
   remove_class_names: input.removeClassNames,
   parser: toParserPayload(input.parser, input.parserId),
-  llm_extract: input.llmExtract,
+  llm_extract: toLLMExtractPayload(input.llmExtract),
   links_on_page: toLinksOnPagePayload(input.linksOnPage),
   screen_size: toScreenSizePayload(input.screenSize),
   metadata: input.metadata
