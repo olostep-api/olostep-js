@@ -1,8 +1,23 @@
 import {OlostepTransport} from '../http/transport.js';
+import {BatchItem} from './BatchItem.js';
 
 interface BatchHandleData extends Record<string, unknown> {
   id: string;
   total_urls?: number;
+}
+
+interface BatchItemsPage {
+  items?: Array<{
+    id: string;
+    url: string;
+    custom_id?: string;
+    retrieve_id?: string;
+    status: string;
+    [key: string]: unknown;
+  }>;
+  cursor?: string | number | null;
+  next_cursor?: string | number | null;
+  has_more?: boolean;
 }
 
 export class Batch {
@@ -54,6 +69,44 @@ export class Batch {
       }
 
       await new Promise((resolve) => setTimeout(resolve, checkEveryNSecs * 1000));
+    }
+  }
+
+  async *items(options?: {
+    batchSize?: number;
+    status?: string;
+    cursor?: string;
+    waitForCompletion?: boolean;
+  }): AsyncGenerator<BatchItem> {
+    const limit = options?.batchSize ?? 50;
+    let cursor: string | undefined = options?.cursor;
+
+    while (true) {
+      const {data} = await this.transport.request<BatchItemsPage>({
+        method: 'GET',
+        path: `/batches/${this.id}/items`,
+        query: {
+          limit,
+          cursor,
+          status: options?.status,
+          wait_for_completion: options?.waitForCompletion
+        }
+      });
+
+      const items = data?.items ?? [];
+      if (!items.length) {
+        break;
+      }
+
+      for (const item of items) {
+        yield new BatchItem(this.transport, item);
+      }
+
+      const nextCursor = data?.next_cursor ?? data?.cursor;
+      if (nextCursor === undefined || nextCursor === null) {
+        break;
+      }
+      cursor = String(nextCursor);
     }
   }
 }
