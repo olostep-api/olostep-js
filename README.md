@@ -54,14 +54,14 @@ Process multiple URLs in a single batch:
 
 ```ts
 // Using URL strings (custom IDs auto-generated)
-const batch = await client.batches([
+const batch = await client.batches.create([
   'https://example.com',
   'https://example.org',
   'https://example.net'
 ]);
 
 // Or with explicit custom IDs
-const batch = await client.batches([
+const batch = await client.batches.create([
   {url: 'https://example.com', customId: 'site-1'},
   {url: 'https://example.org', customId: 'site-2'}
 ]);
@@ -89,7 +89,7 @@ for await (const item of batch.items()) {
 Crawl an entire website:
 
 ```ts
-const crawl = await client.crawls({
+const crawl = await client.crawls.create({
   url: 'https://example.com',
   maxPages: 100,
   maxDepth: 3,
@@ -120,7 +120,7 @@ for await (const page of crawl.pages()) {
 Generate a sitemap of URLs from a website:
 
 ```ts
-const map = await client.maps({
+const map = await client.maps.create({
   url: 'https://example.com',
   topN: 100,
   includeSubdomain: true,
