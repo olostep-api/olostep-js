@@ -73,8 +73,8 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
       expect(['in_progress', 'completed', 'failed']).toContain((info as any).status);
     }, 35000);
 
-    test('should use client.crawls.start() explicit syntax', async () => {
-      const crawl = await client.crawls.start({
+    test('should use client.crawls.create() explicit syntax', async () => {
+      const crawl = await client.crawls.create({
         url: 'https://example.com',
         maxPages: 3,
         maxDepth: 1

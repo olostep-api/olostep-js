@@ -29,7 +29,7 @@ export class CrawlNamespace extends OlostepResource {
     return Array.isArray(value) ? value : [value];
   }
 
-  async start(input: string | CrawlRequest) {
+  async create(input: string | CrawlRequest) {
     const payload: CrawlRequest = typeof input === 'string' ? {url: input} : input;
     const body = {
       start_url: payload.startUrl ?? payload.url,
@@ -99,8 +99,8 @@ export class CrawlNamespace extends OlostepResource {
   }
 
   // Shorthand callable
-  public async call(...args: Parameters<CrawlNamespace['start']>) {
-    return this.start(...args);
+  public async call(...args: Parameters<CrawlNamespace['create']>) {
+    return this.create(...args);
   }
 }
 

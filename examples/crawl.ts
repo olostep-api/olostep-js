@@ -6,9 +6,9 @@ async function main() {
 
   const client = new Olostep();
 
-  // Syntax 1: Direct shorthand call (also works: client.crawls.start())
+  // Syntax 1: Direct shorthand call (also works: client.crawls.create())
   console.log('1. Using client.crawls() - shorthand syntax\n');
-  const crawl = await client.crawls({
+  const crawl = await client.crawls.create({
     url: 'https://example.com',
     maxPages: 5,
     maxDepth: 1

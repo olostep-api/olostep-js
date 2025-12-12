@@ -70,7 +70,7 @@ export default class Olostep {
 
     this.scrapes = attachShorthand(new ScrapeNamespace(this.transport), 'create');
     this.batches = attachShorthand(new BatchNamespace(this.transport), 'create');
-    this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'start');
+    this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'create');
     this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
     this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');
   }
