@@ -152,9 +152,6 @@ const content = await client.retrieve(retrieveId, [
   Format.HTML,
   Format.MARKDOWN
 ]);
-  Format.HTML,
-  Format.MARKDOWN
-]);
 ```
 
 ### Advanced Options
