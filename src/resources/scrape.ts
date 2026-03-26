@@ -2,6 +2,7 @@ import {OlostepTransport} from '../http/transport.js';
 import {Action, Format, LinksOnPageOptions, ParserRef, ScrapeRequest, ScreenSize} from '../types.js';
 import {OlostepResource} from './base.js';
 import {ScrapeResult} from '../client_state/ScrapeResult.js';
+import {normalizeToCamel} from '../casing.js';
 
 export interface ScrapeResponse {
   id: string;
@@ -81,7 +82,7 @@ export class ScrapeNamespace extends OlostepResource {
   }
 
   async create(input: string | ScrapeRequest) {
-    const payload = buildScrapePayload(normalizeScrapeInput(input));
+    const payload = buildScrapePayload(normalizeToCamel(normalizeScrapeInput(input)));
     const {data} = await this.transport.request<ScrapeResponse>({
       method: 'POST',
       path: '/scrapes',

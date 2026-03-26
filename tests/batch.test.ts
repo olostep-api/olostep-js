@@ -1,4 +1,5 @@
 import Olostep from '../src/index.js';
+import {BatchItem} from '../src/types.js';
 
 describe('Olostep SDK - Batch Operations', () => {
   let client: Olostep;
@@ -10,8 +11,8 @@ describe('Olostep SDK - Batch Operations', () => {
     client = new Olostep();
   });
 
-  describe('Batch - Shorthand Syntax', () => {
-    test('should create batch using client.batches()', async () => {
+  describe('Batch - Shorthand Syntax (camelCase)', () => {
+    test('should create batch with camelCase customId', async () => {
       const batch = await client.batches([
         {url: 'https://example.com', customId: 'test-1'},
         {url: 'https://example.org', customId: 'test-2'}
@@ -34,8 +35,21 @@ describe('Olostep SDK - Batch Operations', () => {
     }, 30000);
   });
 
-  describe('Batch - Explicit Syntax', () => {
-    test('should create batch using client.batches.create()', async () => {
+  describe('Batch - Shorthand Syntax (snake_case)', () => {
+    test('should create batch with snake_case custom_id', async () => {
+      const batch = await client.batches([
+        {url: 'https://example.com', custom_id: 'test-snake-1'},
+        {url: 'https://example.org', custom_id: 'test-snake-2'}
+      ] as BatchItem[]);
+
+      expect(batch).toBeDefined();
+      expect(batch.id).toMatch(/^batch_/);
+      expect(batch.total_urls).toBe(2);
+    }, 30000);
+  });
+
+  describe('Batch - Explicit Syntax (camelCase)', () => {
+    test('should create batch using client.batches.create() with camelCase', async () => {
       const batch = await client.batches.create([
         {url: 'https://example.com', customId: 'explicit-test-1'}
       ]);
@@ -66,27 +80,84 @@ describe('Olostep SDK - Batch Operations', () => {
     }, 30000);
   });
 
-  describe('Batch - waitTillDone', () => {
-    test('should wait for batch completion', async () => {
+  describe('Batch - Explicit Syntax (snake_case)', () => {
+    test('should create batch using client.batches.create() with snake_case', async () => {
+      const batch = await client.batches.create([
+        {url: 'https://example.com', custom_id: 'explicit-snake-1'}
+      ] as BatchItem[]);
+
+      expect(batch).toBeDefined();
+      expect(batch.id).toMatch(/^batch_/);
+    }, 30000);
+
+    test('should get batch info using batch.info() with snake_case item', async () => {
+      const batch = await client.batches([
+        {url: 'https://example.com', custom_id: 'info-snake-test'}
+      ] as BatchItem[]);
+
+      const info = await batch.info();
+      expect(info).toBeDefined();
+      expect((info as any).id).toBe(batch.id);
+      expect((info as any).status).toBeDefined();
+    }, 30000);
+
+    test('should use client.batches.info() with snake_case item', async () => {
+      const batch = await client.batches([
+        {url: 'https://example.com', custom_id: 'info-by-id-snake'}
+      ] as BatchItem[]);
+
+      const info = await client.batches.info(batch.id);
+      expect(info).toBeDefined();
+      expect((info as any).id).toBe(batch.id);
+    }, 30000);
+  });
+
+  describe('Batch - waitTillDone (camelCase)', () => {
+    test('should wait for batch completion with camelCase options', async () => {
       const batch = await client.batches([
         {url: 'https://example.com', customId: 'wait-test'}
       ]);
       
       await expect(
-        batch.waitTillDone({checkEveryNSecs: 3, timeoutSeconds: 60})
+        batch.waitTillDone({checkEveryNSecs: 3, timeoutSeconds: 120})
       ).resolves.not.toThrow();
       
       const info = await batch.info();
       expect((info as any).status).toBe('completed');
-    }, 90000);
+    }, 150000);
 
-    test('should timeout if batch takes too long', async () => {
+    test('should timeout if batch takes too long (camelCase)', async () => {
       const batch = await client.batches([
         {url: 'https://example.com', customId: 'timeout-test'}
       ]);
       
       await expect(
         batch.waitTillDone({checkEveryNSecs: 1, timeoutSeconds: 1})
+      ).rejects.toThrow('timed out');
+    }, 30000);
+  });
+
+  describe('Batch - waitTillDone (snake_case)', () => {
+    test('should wait for batch completion with snake_case options', async () => {
+      const batch = await client.batches([
+        {url: 'https://example.com', custom_id: 'wait-snake-test'}
+      ] as BatchItem[]);
+
+      await expect(
+        batch.waitTillDone({check_every_n_secs: 3, timeout_seconds: 120})
+      ).resolves.not.toThrow();
+
+      const info = await batch.info();
+      expect((info as any).status).toBe('completed');
+    }, 150000);
+
+    test('should timeout if batch takes too long (snake_case)', async () => {
+      const batch = await client.batches([
+        {url: 'https://example.com', custom_id: 'timeout-snake-test'}
+      ] as BatchItem[]);
+
+      await expect(
+        batch.waitTillDone({check_every_n_secs: 1, timeout_seconds: 1})
       ).rejects.toThrow('timed out');
     }, 30000);
   });

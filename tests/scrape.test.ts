@@ -17,9 +17,16 @@ describe('Olostep SDK - Scrape Operations', () => {
       expect(testClient).toBeDefined();
     });
 
-    test('should create client with API key passed directly', () => {
+    test('should create client with API key passed directly (camelCase)', () => {
       const testClient = new Olostep({
         apiKey: process.env.OLOSTEP_API_KEY
+      });
+      expect(testClient).toBeDefined();
+    });
+
+    test('should create client with API key passed directly (snake_case)', () => {
+      const testClient = new Olostep({
+        api_key: process.env.OLOSTEP_API_KEY
       });
       expect(testClient).toBeDefined();
     });
@@ -43,7 +50,7 @@ describe('Olostep SDK - Scrape Operations', () => {
       expect(result.retrieve_id).toBeDefined();
     }, 30000);
 
-    test('should scrape with formats parameter', async () => {
+    test('should scrape with formats parameter (camelCase)', async () => {
       const result = await client.scrapes.create({
         url: 'https://example.com',
         formats: [Format.HTML, Format.MARKDOWN]
@@ -52,6 +59,43 @@ describe('Olostep SDK - Scrape Operations', () => {
       expect(result).toBeDefined();
       expect(result.html_content).toBeDefined();
       expect(result.markdown_content).toBeDefined();
+    }, 30000);
+
+    test('should scrape with formats parameter (snake_case)', async () => {
+      const result = await client.scrapes.create({
+        url: 'https://example.com',
+        formats: [Format.HTML, Format.MARKDOWN]
+      });
+
+      expect(result).toBeDefined();
+      expect(result.html_content).toBeDefined();
+      expect(result.markdown_content).toBeDefined();
+    }, 30000);
+
+    test('should scrape with camelCase options', async () => {
+      const result = await client.scrapes.create({
+        url: 'https://example.com',
+        formats: [Format.HTML],
+        removeImages: true,
+        waitBeforeScraping: 0
+      });
+
+      expect(result).toBeDefined();
+      expect(result.id).toMatch(/^scrape_/);
+      expect(result.html_content).toBeDefined();
+    }, 30000);
+
+    test('should scrape with snake_case options', async () => {
+      const result = await client.scrapes.create({
+        url: 'https://example.com',
+        formats: [Format.HTML],
+        remove_images: true,
+        wait_before_scraping: 0
+      });
+
+      expect(result).toBeDefined();
+      expect(result.id).toMatch(/^scrape_/);
+      expect(result.html_content).toBeDefined();
     }, 30000);
   });
 

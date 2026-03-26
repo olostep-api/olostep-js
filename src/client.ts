@@ -1,11 +1,12 @@
 import {OlostepClientOptions, resolveClientOptions} from './config.js';
 import {OlostepTransport} from './http/transport.js';
+import {AnswerNamespace} from './resources/answer.js';
 import {BatchNamespace} from './resources/batch.js';
 import {CrawlNamespace} from './resources/crawl.js';
 import {RetrieveNamespace} from './resources/retrieve.js';
 import {ScrapeNamespace} from './resources/scrape.js';
 import {MapNamespace} from './resources/map.js';
-import {BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, MapRequest} from './types.js';
+import {AnswerRequest, BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, MapRequest} from './types.js';
 
 type NamespaceShorthand<
   TNamespace extends object,
@@ -55,6 +56,7 @@ export default class Olostep {
   public readonly batches: NamespaceShorthand<BatchNamespace, 'create', BatchNamespace['create']>;
   public readonly crawls: NamespaceShorthand<CrawlNamespace, 'create', CrawlNamespace['create']>;
   public readonly maps: NamespaceShorthand<MapNamespace, 'create', MapNamespace['create']>;
+  public readonly answers: NamespaceShorthand<AnswerNamespace, 'create', AnswerNamespace['create']>;
   public readonly retrieve: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
 
   constructor(options?: OlostepClientOptions) {
@@ -72,6 +74,7 @@ export default class Olostep {
     this.batches = attachShorthand(new BatchNamespace(this.transport), 'create');
     this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'create');
     this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
+    this.answers = attachShorthand(new AnswerNamespace(this.transport), 'create');
     this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');
   }
 
@@ -89,6 +92,10 @@ export default class Olostep {
 
   async mapSite(input: string | MapRequest) {
     return this.maps(input);
+  }
+
+  async getAnswer(input: string | AnswerRequest) {
+    return this.answers(input);
   }
 
   async retrieveContent(retrieveId: string, formats?: Format | Format[]) {
