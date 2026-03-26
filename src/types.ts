@@ -127,6 +127,12 @@ interface MapRequestBase {
 }
 export type MapRequest = FlexibleInput<MapRequestBase>;
 
+interface AnswerRequestBase {
+  task: string;
+  jsonFormat?: Record<string, unknown>;
+}
+export type AnswerRequest = FlexibleInput<AnswerRequestBase>;
+
 interface RetrieveRequestBase {
   retrieveId: string;
   formats?: Format | Format[];
@@ -138,6 +144,7 @@ export type RequestPayload =
   | BatchItem[]
   | CrawlRequest
   | MapRequest
+  | AnswerRequest
   | RetrieveRequest;
 
 interface ItemsIteratorOptionsBase {
