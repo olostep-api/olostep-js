@@ -80,7 +80,7 @@ console.log(info);
 
 // Stream individual results
 for await (const item of batch.items()) {
-  console.log(item.customId);
+  console.log(item.custom_id);
 }
 ```
 

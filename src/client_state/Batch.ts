@@ -1,4 +1,6 @@
 import {OlostepTransport} from '../http/transport.js';
+import {ItemsIteratorOptions, WaitTillDoneOptions} from '../types.js';
+import {normalizeToCamel} from '../casing.js';
 import {BatchItem} from './BatchItem.js';
 
 interface BatchHandleData extends Record<string, unknown> {
@@ -41,12 +43,10 @@ export class Batch {
     return data;
   }
 
-  async waitTillDone(options?: {
-    checkEveryNSecs?: number;
-    timeoutSeconds?: number;
-  }): Promise<void> {
-    const checkEveryNSecs = options?.checkEveryNSecs ?? 10;
-    const timeoutSeconds = options?.timeoutSeconds ?? 600;
+  async waitTillDone(options?: WaitTillDoneOptions): Promise<void> {
+    const opts = options ? normalizeToCamel(options) : undefined;
+    const checkEveryNSecs = opts?.checkEveryNSecs ?? 10;
+    const timeoutSeconds = opts?.timeoutSeconds ?? 600;
     const startTime = Date.now();
 
     while (true) {
@@ -72,14 +72,10 @@ export class Batch {
     }
   }
 
-  async *items(options?: {
-    batchSize?: number;
-    status?: string;
-    cursor?: string;
-    waitForCompletion?: boolean;
-  }): AsyncGenerator<BatchItem> {
-    const limit = options?.batchSize ?? 50;
-    let cursor: string | undefined = options?.cursor;
+  async *items(options?: ItemsIteratorOptions): AsyncGenerator<BatchItem> {
+    const opts = options ? normalizeToCamel(options) : undefined;
+    const limit = opts?.batchSize ?? 50;
+    let cursor: string | undefined = opts?.cursor;
 
     while (true) {
       const {data} = await this.transport.request<BatchItemsPage>({
@@ -88,8 +84,8 @@ export class Batch {
         query: {
           limit,
           cursor,
-          status: options?.status,
-          wait_for_completion: options?.waitForCompletion
+          status: opts?.status,
+          wait_for_completion: opts?.waitForCompletion
         }
       });
 

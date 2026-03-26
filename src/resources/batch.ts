@@ -1,8 +1,9 @@
 import {OlostepTransport} from '../http/transport.js';
-import {BatchItem as BatchItemType, BatchRequestOptions, Format, LinksOnPageOptions, ParserRef} from '../types.js';
+import {BatchItem as BatchItemType, BatchRequestOptions, Format, ItemsIteratorOptions, LinksOnPageOptions, ParserRef} from '../types.js';
 import {OlostepResource} from './base.js';
 import {Batch} from '../client_state/Batch.js';
 import {BatchItem} from '../client_state/BatchItem.js';
+import {normalizeToCamel} from '../casing.js';
 
 export interface BatchResponse {
   id: string;
@@ -80,15 +81,19 @@ export class BatchNamespace extends OlostepResource {
   }
 
   async create(input: string | string[] | BatchItemType[], options?: BatchRequestOptions) {
-    const items = toApiBatchItems(normalizeBatchInput(input));
+    const normalizedInput = Array.isArray(input)
+      ? input.map((item) => (typeof item === 'object' ? normalizeToCamel(item) : item))
+      : input;
+    const normalizedOptions = options ? normalizeToCamel(options) : undefined;
+    const items = toApiBatchItems(normalizeBatchInput(normalizedInput as string | string[] | BatchItemType[]));
     const {data} = await this.transport.request<BatchResponse>({
       method: 'POST',
       path: '/batches',
       body: {
         items,
-        country: options?.country,
-        parser: toParserPayload(options?.parser, options?.parserId),
-        links_on_page: toLinksOnPagePayload(options?.linksOnPage)
+        country: normalizedOptions?.country,
+        parser: toParserPayload(normalizedOptions?.parser, normalizedOptions?.parserId),
+        links_on_page: toLinksOnPagePayload(normalizedOptions?.linksOnPage)
       }
     });
     return new Batch(this.transport, data);
@@ -109,10 +114,11 @@ export class BatchNamespace extends OlostepResource {
 
   async *items(
     batchId: string,
-    options?: {batchSize?: number; status?: string; cursor?: string; waitForCompletion?: boolean}
+    options?: ItemsIteratorOptions
   ): AsyncGenerator<BatchItem> {
-    const limit = options?.batchSize ?? 50;
-    let cursor: string | undefined = options?.cursor;
+    const opts = options ? normalizeToCamel(options) : undefined;
+    const limit = opts?.batchSize ?? 50;
+    let cursor: string | undefined = opts?.cursor;
 
     while (true) {
       const {data} = await this.transport.request<BatchItemsPage>({
@@ -121,8 +127,8 @@ export class BatchNamespace extends OlostepResource {
         query: {
           limit,
           cursor,
-          status: options?.status,
-          wait_for_completion: options?.waitForCompletion
+          status: opts?.status,
+          wait_for_completion: opts?.waitForCompletion
         }
       });
 

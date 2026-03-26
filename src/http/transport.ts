@@ -212,7 +212,7 @@ export class OlostepTransport {
     let attempts = 0;
     let error: Error | undefined;
 
-    while (attempts <= this.retry.retries) {
+    while (attempts <= this.retry.maxRetries) {
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -256,7 +256,7 @@ export class OlostepTransport {
         };
       } catch (err) {
         error = err as Error;
-        const isLastAttempt = attempts === this.retry.retries;
+        const isLastAttempt = attempts === this.retry.maxRetries;
 
         if (isLastAttempt) {
           if (error.name === 'AbortError') {
@@ -265,7 +265,7 @@ export class OlostepTransport {
           throw new OlostepAPIConnectionError('Failed to reach Olostep API', {cause: error});
         }
 
-        const delay = Math.pow(this.retry.backoffFactor, attempts) * 250;
+        const delay = this.retry.initialDelayMs * Math.pow(2, attempts);
         await sleep(delay);
         attempts += 1;
       }

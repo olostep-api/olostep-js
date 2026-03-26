@@ -1,3 +1,5 @@
+import {FlexibleInput} from './casing.js';
+
 export type Primitive = string | number | boolean | null | undefined;
 
 export enum Format {
@@ -20,23 +22,26 @@ export interface ParserRef {
   version?: string;
 }
 
-export interface ScreenSize {
+interface ScreenSizeBase {
   screenType?: string;
   screenWidth?: number;
   screenHeight?: number;
 }
+export type ScreenSize = FlexibleInput<ScreenSizeBase>;
 
-export interface LLMExtractOptions {
+interface LLMExtractOptionsBase {
   schema?: Record<string, unknown> | string;
   prompt?: string;
 }
+export type LLMExtractOptions = FlexibleInput<LLMExtractOptionsBase>;
 
-export interface LinksOnPageOptions {
+interface LinksOnPageOptionsBase {
   absoluteLinks?: boolean;
   queryToOrderLinksBy?: string;
   includeLinks?: string[];
   excludeLinks?: string[];
 }
+export type LinksOnPageOptions = FlexibleInput<LinksOnPageOptionsBase>;
 
 export interface WaitAction {
   type: 'wait';
@@ -64,7 +69,7 @@ export interface ScrollAction {
 
 export type Action = WaitAction | FillInputAction | ClickAction | ScrollAction;
 
-export interface ScrapeRequest {
+interface ScrapeRequestBase {
   url: string;
   formats?: Format | Format[] | string | string[];
   country?: Country | string;
@@ -81,20 +86,23 @@ export interface ScrapeRequest {
   screenSize?: ScreenSize;
   metadata?: Record<string, Primitive>;
 }
+export type ScrapeRequest = FlexibleInput<ScrapeRequestBase>;
 
-export interface BatchItem {
+interface BatchItemBase {
   url: string;
-  customId: string; // Required by API
+  customId: string;
 }
+export type BatchItem = FlexibleInput<BatchItemBase>;
 
-export interface BatchRequestOptions {
+interface BatchRequestOptionsBase {
   country?: Country | string;
   parser?: ParserRef | string;
   parserId?: string;
   linksOnPage?: LinksOnPageOptions;
 }
+export type BatchRequestOptions = FlexibleInput<BatchRequestOptionsBase>;
 
-export interface CrawlRequest {
+interface CrawlRequestBase {
   url?: string;
   startUrl?: string;
   maxPages?: number;
@@ -107,8 +115,9 @@ export interface CrawlRequest {
   topN?: number;
   webhookUrl?: string;
 }
+export type CrawlRequest = FlexibleInput<CrawlRequestBase>;
 
-export interface MapRequest {
+interface MapRequestBase {
   url: string;
   searchQuery?: string;
   topN?: number;
@@ -116,11 +125,13 @@ export interface MapRequest {
   includeUrls?: string | string[];
   excludeUrls?: string | string[];
 }
+export type MapRequest = FlexibleInput<MapRequestBase>;
 
-export interface RetrieveRequest {
+interface RetrieveRequestBase {
   retrieveId: string;
   formats?: Format | Format[];
 }
+export type RetrieveRequest = FlexibleInput<RetrieveRequestBase>;
 
 export type RequestPayload =
   | ScrapeRequest
@@ -128,6 +139,27 @@ export type RequestPayload =
   | CrawlRequest
   | MapRequest
   | RetrieveRequest;
+
+interface ItemsIteratorOptionsBase {
+  batchSize?: number;
+  status?: string;
+  cursor?: string;
+  waitForCompletion?: boolean;
+}
+export type ItemsIteratorOptions = FlexibleInput<ItemsIteratorOptionsBase>;
+
+interface PagesIteratorOptionsBase {
+  batchSize?: number;
+  cursor?: string;
+  waitForCompletion?: boolean;
+}
+export type PagesIteratorOptions = FlexibleInput<PagesIteratorOptionsBase>;
+
+interface WaitTillDoneOptionsBase {
+  checkEveryNSecs?: number;
+  timeoutSeconds?: number;
+}
+export type WaitTillDoneOptions = FlexibleInput<WaitTillDoneOptionsBase>;
 
 export interface PaginatedIteratorConfig<T> {
   batchSize?: number;
