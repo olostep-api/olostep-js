@@ -2,6 +2,7 @@ import {OlostepTransport} from '../http/transport.js';
 import {MapRequest} from '../types.js';
 import {OlostepResource} from './base.js';
 import {Map} from '../client_state/Map.js';
+import {normalizeToCamel} from '../casing.js';
 
 export interface MapResponse extends Record<string, unknown> {
   id: string;
@@ -22,7 +23,7 @@ export class MapNamespace extends OlostepResource {
   }
 
   async create(input: string | MapRequest) {
-    const payload: MapRequest = typeof input === 'string' ? {url: input} : input;
+    const payload: MapRequest = typeof input === 'string' ? {url: input} : normalizeToCamel(input);
     const body = {
       url: payload.url,
       search_query: payload.searchQuery,

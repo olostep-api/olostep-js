@@ -1,8 +1,9 @@
 import {OlostepTransport} from '../http/transport.js';
-import {CrawlRequest} from '../types.js';
+import {CrawlRequest, PagesIteratorOptions} from '../types.js';
 import {OlostepResource} from './base.js';
 import {CrawlPage} from '../client_state/CrawlPage.js';
 import {Crawl} from '../client_state/Crawl.js';
+import {normalizeToCamel} from '../casing.js';
 
 export interface CrawlResponse {
   id: string;
@@ -30,7 +31,7 @@ export class CrawlNamespace extends OlostepResource {
   }
 
   async create(input: string | CrawlRequest) {
-    const payload: CrawlRequest = typeof input === 'string' ? {url: input} : input;
+    const payload: CrawlRequest = typeof input === 'string' ? {url: input} : normalizeToCamel(input);
     const body = {
       start_url: payload.startUrl ?? payload.url,
       max_pages: payload.maxPages,
@@ -65,10 +66,11 @@ export class CrawlNamespace extends OlostepResource {
 
   async *pages(
     crawlId: string,
-    options?: {batchSize?: number; cursor?: string; waitForCompletion?: boolean}
+    options?: PagesIteratorOptions
   ): AsyncGenerator<CrawlPage> {
-    const limit = options?.batchSize ?? 50;
-    let cursor: string | undefined = options?.cursor;
+    const opts = options ? normalizeToCamel(options) : undefined;
+    const limit = opts?.batchSize ?? 50;
+    let cursor: string | undefined = opts?.cursor;
 
     while (true) {
       const {data} = await this.transport.request<CrawlPagesResponse>({
@@ -77,7 +79,7 @@ export class CrawlNamespace extends OlostepResource {
         query: {
           limit,
           cursor,
-          wait_for_completion: options?.waitForCompletion
+          wait_for_completion: opts?.waitForCompletion
         }
       });
 

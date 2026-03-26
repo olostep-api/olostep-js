@@ -1,9 +1,12 @@
-export interface RetryOptions {
-  retries: number;
-  backoffFactor: number;
-}
+import {FlexibleInput, normalizeToCamel} from './casing.js';
 
-export interface OlostepClientOptions {
+interface RetryOptionsBase {
+  maxRetries: number;
+  initialDelayMs: number;
+}
+export type RetryOptions = FlexibleInput<RetryOptionsBase>;
+
+interface OlostepClientOptionsBase {
   apiKey?: string;
   apiBaseUrl?: string;
   timeoutMs?: number;
@@ -13,6 +16,7 @@ export interface OlostepClientOptions {
   logPath?: string | null;
   logger?: Pick<Console, 'debug' | 'info' | 'warn' | 'error'>;
 }
+export type OlostepClientOptions = FlexibleInput<OlostepClientOptionsBase>;
 
 export const SDK_VERSION = process.env.npm_package_version ?? '0.1.0';
 
@@ -29,15 +33,15 @@ export const DEFAULT_LOG_PATH = process.env.OLOSTEP_IO_LOG_PATH ?? null;
 
 export const DEFAULT_CLIENT_OPTIONS: Required<
   Pick<
-    OlostepClientOptions,
+    OlostepClientOptionsBase,
     'apiBaseUrl' | 'timeoutMs' | 'retry' | 'validateRequests' | 'userAgent' | 'logPath'
   >
 > = {
   apiBaseUrl: DEFAULT_BASE_URL,
   timeoutMs: DEFAULT_TIMEOUT_MS,
   retry: {
-    retries: 3,
-    backoffFactor: 2
+    maxRetries: 3,
+    initialDelayMs: 1000
   },
   validateRequests: true,
   userAgent: DEFAULT_USER_AGENT,
@@ -46,8 +50,9 @@ export const DEFAULT_CLIENT_OPTIONS: Required<
 
 export const resolveClientOptions = (
   options: OlostepClientOptions = {}
-): Required<Omit<OlostepClientOptions, 'logger'>> & { logger?: OlostepClientOptions['logger'] } => {
-  const apiKey = options.apiKey ?? process.env.OLOSTEP_API_KEY;
+): Required<Omit<OlostepClientOptionsBase, 'logger'>> & { logger?: OlostepClientOptionsBase['logger'] } => {
+  const opts = normalizeToCamel(options) as OlostepClientOptionsBase;
+  const apiKey = opts.apiKey ?? process.env.OLOSTEP_API_KEY;
 
   if (!apiKey) {
     throw new Error(
@@ -57,13 +62,13 @@ export const resolveClientOptions = (
 
   return {
     apiKey,
-    apiBaseUrl: options.apiBaseUrl ?? DEFAULT_CLIENT_OPTIONS.apiBaseUrl,
-    timeoutMs: options.timeoutMs ?? DEFAULT_CLIENT_OPTIONS.timeoutMs,
-    retry: options.retry ?? DEFAULT_CLIENT_OPTIONS.retry,
-    validateRequests: options.validateRequests ?? DEFAULT_CLIENT_OPTIONS.validateRequests,
-    userAgent: options.userAgent ?? DEFAULT_CLIENT_OPTIONS.userAgent,
-    logPath: options.logPath ?? DEFAULT_CLIENT_OPTIONS.logPath,
-    logger: options.logger
+    apiBaseUrl: opts.apiBaseUrl ?? DEFAULT_CLIENT_OPTIONS.apiBaseUrl,
+    timeoutMs: opts.timeoutMs ?? DEFAULT_CLIENT_OPTIONS.timeoutMs,
+    retry: opts.retry ?? DEFAULT_CLIENT_OPTIONS.retry,
+    validateRequests: opts.validateRequests ?? DEFAULT_CLIENT_OPTIONS.validateRequests,
+    userAgent: opts.userAgent ?? DEFAULT_CLIENT_OPTIONS.userAgent,
+    logPath: opts.logPath ?? DEFAULT_CLIENT_OPTIONS.logPath,
+    logger: opts.logger
   };
 };
 
