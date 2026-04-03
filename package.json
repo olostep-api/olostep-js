@@ -10,6 +10,7 @@
     "dist"
   ],
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
