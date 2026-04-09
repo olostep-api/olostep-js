@@ -20,14 +20,15 @@ export class BatchItem {
       throw new Error('Batch item does not have a retrieve_id yet.');
     }
 
-    const payload = {
-      retrieve_id: this.retrieve_id,
-      formats: formats && !Array.isArray(formats) ? [formats] : formats
-    };
+    // The /retrieve endpoint is GET with query params (not POST).
+    const resolvedFormats = formats && !Array.isArray(formats) ? [formats] : formats;
     const {data} = await this.transport.request({
-      method: 'POST',
+      method: 'GET',
       path: '/retrieve',
-      body: payload
+      query: {
+        retrieve_id: this.retrieve_id,
+        ...(resolvedFormats ? {formats: resolvedFormats} : {})
+      }
     });
     return data;
   }

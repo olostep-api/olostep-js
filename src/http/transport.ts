@@ -260,9 +260,16 @@ export class OlostepTransport {
 
         if (isLastAttempt) {
           if (error.name === 'AbortError') {
-            throw new OlostepAPIConnectionError('Request timed out', {cause: error});
+            throw new OlostepAPIConnectionError(
+              `Request timed out calling ${input.method} ${input.path}`,
+              {cause: error}
+            );
           }
-          throw new OlostepAPIConnectionError('Failed to reach Olostep API', {cause: error});
+          const causeDetail = error?.message ? `: ${error.message}` : '';
+          throw new OlostepAPIConnectionError(
+            `Failed to reach Olostep API (${input.method} ${input.path})${causeDetail}`,
+            {cause: error}
+          );
         }
 
         const delay = this.retry.initialDelayMs * Math.pow(2, attempts);

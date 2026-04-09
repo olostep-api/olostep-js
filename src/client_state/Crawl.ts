@@ -66,6 +66,14 @@ export class Crawl {
     const opts = options ? normalizeToCamel(options) : undefined;
     const limit = opts?.batchSize ?? 50;
     let cursor: string | undefined = opts?.cursor;
+    const waitForCompletion = opts?.waitForCompletion ?? true;
+
+    // Wait for the crawl to finish before paginating so we don't race the
+    // server (matches the Python SDK behaviour). Callers can opt out with
+    // { waitForCompletion: false }.
+    if (waitForCompletion) {
+      await this.waitTillDone();
+    }
 
     while (true) {
       const {data} = await this.transport.request<CrawlPagesResponse>({
@@ -73,8 +81,7 @@ export class Crawl {
         path: `/crawls/${this.id}/pages`,
         query: {
           limit,
-          cursor,
-          wait_for_completion: opts?.waitForCompletion
+          cursor
         }
       });
 

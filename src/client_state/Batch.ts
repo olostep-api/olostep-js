@@ -76,6 +76,14 @@ export class Batch {
     const opts = options ? normalizeToCamel(options) : undefined;
     const limit = opts?.batchSize ?? 50;
     let cursor: string | undefined = opts?.cursor;
+    const waitForCompletion = opts?.waitForCompletion ?? true;
+
+    // Wait for the batch to finish before paginating so we don't race the
+    // server (matches the Python SDK behaviour). Callers can opt out with
+    // { waitForCompletion: false }.
+    if (waitForCompletion) {
+      await this.waitTillDone();
+    }
 
     while (true) {
       const {data} = await this.transport.request<BatchItemsPage>({
@@ -84,8 +92,7 @@ export class Batch {
         query: {
           limit,
           cursor,
-          status: opts?.status,
-          wait_for_completion: opts?.waitForCompletion
+          status: opts?.status
         }
       });
 
