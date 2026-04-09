@@ -1,5 +1,4 @@
-# Olostep Node SDK (preview)
-
+# Olostep Node SDK 
 This package is the official Node.js SDK for the [Olostep web data platform](https://www.olostep.com).  
 
 ## Getting started
