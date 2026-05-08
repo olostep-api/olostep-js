@@ -137,6 +137,55 @@ for await (const url of map.urls()) {
 const info = await map.info();
 ```
 
+### Search
+
+Search the web with a natural language query and get back deduplicated links:
+
+```ts
+// Simple search
+const search = await client.searches.create('Best Answer Engine Optimization startups');
+
+console.log(`Search ${search.id} returned ${search.links.length} links`);
+
+for (const link of search.links) {
+  console.log(link.url, '-', link.title);
+}
+```
+
+Limit the result count and filter by domain:
+
+```ts
+const search = await client.searches.create({
+  query: 'OpenAI Sora shutdown analysis',
+  limit: 5,
+  includeDomains: ['bbc.com', 'nytimes.com', 'wsj.com'],
+  excludeDomains: ['pinterest.com']
+});
+```
+
+Embed scraped page content directly on each link in a single round-trip:
+
+```ts
+import Olostep, {Format} from 'olostep';
+
+const search = await client.searches.create({
+  query: "What's going on with OpenAI's Sora shutting down?",
+  limit: 5,
+  scrapeOptions: {
+    formats: [Format.MARKDOWN],
+    removeCssSelectors: 'default',
+    timeout: 25
+  }
+});
+
+for (const link of search.links) {
+  console.log(link.url, (link.markdown_content || '').length, 'chars');
+}
+
+// Get search by ID (idempotent read - no rebill, no rescrape)
+const fetched = await client.searches.get(search.id);
+```
+
 ### Content Retrieval
 
 Retrieve previously scraped content:
@@ -246,7 +295,7 @@ olostep/
 │  ├─ config.ts              # Option resolution & defaults
 │  ├─ errors.ts              # Exception hierarchy
 │  ├─ http/transport.ts      # Fetch-based HTTP transport with retries
-│  ├─ resources/             # Namespaces (scrape, batch, crawl, map, retrieve)
+│  ├─ resources/             # Namespaces (scrape, batch, crawl, map, answer, search, retrieve)
 │  └─ types.ts               # Shared enums and DTOs
 ├─ package.json              # NPM metadata + scripts
 ├─ tsconfig*.json            # TypeScript build configs
@@ -276,6 +325,7 @@ npx tsx examples/scrape.ts
 npx tsx examples/batch.ts
 npx tsx examples/crawl.ts
 npx tsx examples/map.ts
+npx tsx examples/search.ts
 npx tsx examples/retrieve.ts <retrieve_id>
 ```
 

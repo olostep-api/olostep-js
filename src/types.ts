@@ -133,6 +133,22 @@ interface AnswerRequestBase {
 }
 export type AnswerRequest = FlexibleInput<AnswerRequestBase>;
 
+interface SearchScrapeOptionsBase {
+  formats?: Format | Format[] | string | string[];
+  removeCssSelectors?: string;
+  timeout?: number;
+}
+export type SearchScrapeOptions = FlexibleInput<SearchScrapeOptionsBase>;
+
+interface SearchRequestBase {
+  query: string;
+  limit?: number;
+  includeDomains?: string[];
+  excludeDomains?: string[];
+  scrapeOptions?: SearchScrapeOptions;
+}
+export type SearchRequest = FlexibleInput<SearchRequestBase>;
+
 interface RetrieveRequestBase {
   retrieveId: string;
   formats?: Format | Format[];
@@ -145,6 +161,7 @@ export type RequestPayload =
   | CrawlRequest
   | MapRequest
   | AnswerRequest
+  | SearchRequest
   | RetrieveRequest;
 
 interface ItemsIteratorOptionsBase {

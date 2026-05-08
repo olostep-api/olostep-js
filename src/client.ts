@@ -6,7 +6,8 @@ import {CrawlNamespace} from './resources/crawl.js';
 import {RetrieveNamespace} from './resources/retrieve.js';
 import {ScrapeNamespace} from './resources/scrape.js';
 import {MapNamespace} from './resources/map.js';
-import {AnswerRequest, BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, MapRequest} from './types.js';
+import {SearchNamespace} from './resources/search.js';
+import {AnswerRequest, BatchItem, BatchRequestOptions, CrawlRequest, Format, ScrapeRequest, MapRequest, SearchRequest} from './types.js';
 
 type NamespaceShorthand<
   TNamespace extends object,
@@ -57,6 +58,7 @@ export default class Olostep {
   public readonly crawls: NamespaceShorthand<CrawlNamespace, 'create', CrawlNamespace['create']>;
   public readonly maps: NamespaceShorthand<MapNamespace, 'create', MapNamespace['create']>;
   public readonly answers: NamespaceShorthand<AnswerNamespace, 'create', AnswerNamespace['create']>;
+  public readonly searches: NamespaceShorthand<SearchNamespace, 'create', SearchNamespace['create']>;
   public readonly retrieve: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
 
   constructor(options?: OlostepClientOptions) {
@@ -75,6 +77,7 @@ export default class Olostep {
     this.crawls = attachShorthand(new CrawlNamespace(this.transport), 'create');
     this.maps = attachShorthand(new MapNamespace(this.transport), 'create');
     this.answers = attachShorthand(new AnswerNamespace(this.transport), 'create');
+    this.searches = attachShorthand(new SearchNamespace(this.transport), 'create');
     this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');
   }
 
@@ -96,6 +99,10 @@ export default class Olostep {
 
   async getAnswer(input: string | AnswerRequest) {
     return this.answers(input);
+  }
+
+  async search(input: string | SearchRequest) {
+    return this.searches(input);
   }
 
   async retrieveContent(retrieveId: string, formats?: Format | Format[]) {
