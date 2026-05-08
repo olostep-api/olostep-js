@@ -1,6 +1,6 @@
 {
   "name": "olostep",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Node.js SDK for the Olostep web data platform.",
   "license": "MIT",
   "type": "module",
