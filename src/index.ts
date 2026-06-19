@@ -1,6 +1,7 @@
 export {default} from './client.js';
 export {default as Olostep} from './client.js';
 export * from './types.js';
+export type {ScrapeStorageResult} from './client_state/ScrapeResult.js';
 export * from './errors.js';
 export {AnswerResult} from './client_state/AnswerResult.js';
 export {SearchResult} from './client_state/SearchResult.js';

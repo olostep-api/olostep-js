@@ -1,5 +1,5 @@
 import {OlostepTransport} from '../http/transport.js';
-import {Action, Format, LinksOnPageOptions, ParserRef, ScrapeRequest, ScreenSize} from '../types.js';
+import {Action, Format, LinksOnPageOptions, ParserRef, ScrapeRequest, ScrapeStorageOptions, ScreenSize} from '../types.js';
 import {OlostepResource} from './base.js';
 import {ScrapeResult} from '../client_state/ScrapeResult.js';
 import {normalizeToCamel} from '../casing.js';
@@ -59,6 +59,13 @@ const toLLMExtractPayload = (llmExtract?: {schema?: Record<string, unknown> | st
 };
 const normalizeScrapeInput = (input: string | ScrapeRequest): ScrapeRequest =>
   typeof input === 'string' ? {url: input} : input;
+const toStoragePayload = (storage?: ScrapeStorageOptions) => {
+  if (!storage) {
+    return undefined;
+  }
+  return {expires_in: storage.expiresIn};
+};
+
 const buildScrapePayload = (input: ScrapeRequest) => ({
   url_to_scrape: input.url,
   formats: toArray(input.formats),
@@ -73,6 +80,7 @@ const buildScrapePayload = (input: ScrapeRequest) => ({
   llm_extract: toLLMExtractPayload(input.llmExtract),
   links_on_page: toLinksOnPagePayload(input.linksOnPage),
   screen_size: toScreenSizePayload(input.screenSize),
+  storage: toStoragePayload(input.storage),
   metadata: input.metadata
 });
 
