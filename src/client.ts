@@ -3,6 +3,7 @@ import {OlostepTransport} from './http/transport.js';
 import {AnswerNamespace} from './resources/answer.js';
 import {BatchNamespace} from './resources/batch.js';
 import {CrawlNamespace} from './resources/crawl.js';
+import {MonitorNamespace} from './resources/monitor.js';
 import {RetrieveNamespace} from './resources/retrieve.js';
 import {ScrapeNamespace} from './resources/scrape.js';
 import {MapNamespace} from './resources/map.js';
@@ -60,6 +61,7 @@ export default class Olostep {
   public readonly answers: NamespaceShorthand<AnswerNamespace, 'create', AnswerNamespace['create']>;
   public readonly searches: NamespaceShorthand<SearchNamespace, 'create', SearchNamespace['create']>;
   public readonly retrieve: NamespaceShorthand<RetrieveNamespace, 'get', RetrieveNamespace['get']>;
+  public readonly monitors: MonitorNamespace;
 
   constructor(options?: OlostepClientOptions) {
     const resolved = resolveClientOptions(options);
@@ -79,6 +81,7 @@ export default class Olostep {
     this.answers = attachShorthand(new AnswerNamespace(this.transport), 'create');
     this.searches = attachShorthand(new SearchNamespace(this.transport), 'create');
     this.retrieve = attachShorthand(new RetrieveNamespace(this.transport), 'get');
+    this.monitors = new MonitorNamespace(this.transport);
   }
 
   async scrapeUrl(input: string | ScrapeRequest) {
