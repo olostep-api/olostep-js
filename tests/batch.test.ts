@@ -130,7 +130,11 @@ describe('Olostep SDK - Batch Operations', () => {
       const batch = await client.batches([
         {url: 'https://example.com', customId: 'timeout-test'}
       ]);
-      
+
+      // Force a non-terminal status so the timeout path is deterministic
+      // rather than racing how fast the live batch actually finishes.
+      (batch as any).info = async () => ({status: 'in_progress'});
+
       await expect(
         batch.waitTillDone({checkEveryNSecs: 1, timeoutSeconds: 1})
       ).rejects.toThrow('timed out');
@@ -155,6 +159,10 @@ describe('Olostep SDK - Batch Operations', () => {
       const batch = await client.batches([
         {url: 'https://example.com', custom_id: 'timeout-snake-test'}
       ] as BatchItem[]);
+
+      // Force a non-terminal status so the timeout path is deterministic
+      // rather than racing how fast the live batch actually finishes.
+      (batch as any).info = async () => ({status: 'in_progress'});
 
       await expect(
         batch.waitTillDone({check_every_n_secs: 1, timeout_seconds: 1})
