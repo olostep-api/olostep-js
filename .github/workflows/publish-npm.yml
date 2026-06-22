@@ -34,8 +34,20 @@ jobs:
       # npm ci installs exactly what's in package-lock.json (commit the lockfile when deps change).
       - run: npm ci
 
-      # Integration tests need OLOSTEP_API_KEY; typecheck + prepublishOnly build gate the release.
       - run: npm run check:types
+
+      # Live API tests gate the release. Runs when OLOSTEP_API_KEY is set;
+      # warns and continues if the secret is missing so a release is never
+      # silently blocked by a config gap.
+      - name: Live API tests
+        env:
+          OLOSTEP_API_KEY: ${{ secrets.OLOSTEP_API_KEY }}
+        run: |
+          if [ -z "$OLOSTEP_API_KEY" ]; then
+            echo "::warning::OLOSTEP_API_KEY not set - publishing without the live test gate"
+          else
+            npm test
+          fi
 
       - run: npm publish
         env:
