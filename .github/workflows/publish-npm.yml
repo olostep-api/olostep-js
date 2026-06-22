@@ -1,24 +1,24 @@
-# Publishes to https://www.npmjs.com/package/olostep
+# Publishes https://www.npmjs.com/package/olostep
 #
-# Setup (one time):
-#   - Repo → Settings → Secrets → Actions: add NPM_TOKEN
-#     (npmjs.com → Access Tokens → Granular or Automation, with publish for package "olostep")
+# Release flow:
+#   1. Bump "version" in package.json (e.g. 1.1.0 -> 1.2.0) in a PR.
+#   2. Merge the PR to main.
+#   3. This workflow runs on the push to main, sees the new version is not yet
+#      on npm, runs the live test suite, publishes, and tags vX.Y.Z.
+#   Merges that do not change the version publish nothing.
 #
-# Release:
-#   1. Bump "version" in package.json on main (must match the tag, without the "v")
-#   2. git tag vx.x.x&& git push origin vx.x.x
-#   Or: Actions → "Publish to npm" → Run workflow (after version bump is on the branch you run from)
+# Setup (one time): repo secrets NPM_TOKEN (npm automation token) and
+# OLOSTEP_API_KEY (used to gate the release on the live test suite).
 
 name: Publish to npm
 
 on:
   push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # needed to push the release tag
 
 jobs:
   publish:
@@ -31,24 +31,46 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
-      # npm ci installs exactly what's in package-lock.json (commit the lockfile when deps change).
       - run: npm ci
 
-      - run: npm run check:types
+      # Only publish when package.json has a version that is not on npm yet.
+      - name: Check whether this version needs publishing
+        id: check
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if npm view "olostep@$VERSION" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "olostep@$VERSION is already on npm - nothing to publish"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "olostep@$VERSION is new - will publish"
+          fi
 
-      # Live API tests gate the release. Runs when OLOSTEP_API_KEY is set;
-      # warns and continues if the secret is missing so a release is never
-      # silently blocked by a config gap.
+      - name: Type-check
+        if: steps.check.outputs.publish == 'true'
+        run: npm run check:types
+
+      # Live API tests gate the release - a failing suite blocks publish.
       - name: Live API tests
+        if: steps.check.outputs.publish == 'true'
         env:
           OLOSTEP_API_KEY: ${{ secrets.OLOSTEP_API_KEY }}
         run: |
           if [ -z "$OLOSTEP_API_KEY" ]; then
-            echo "::warning::OLOSTEP_API_KEY not set - publishing without the live test gate"
-          else
-            npm test
+            echo "::error::OLOSTEP_API_KEY not set - refusing to publish without the live test gate"
+            exit 1
           fi
+          npm test
 
-      - run: npm publish
+      - name: Publish to npm
+        if: steps.check.outputs.publish == 'true'
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Tag the release
+        if: steps.check.outputs.publish == 'true'
+        run: |
+          git tag "v${{ steps.check.outputs.version }}"
+          git push origin "v${{ steps.check.outputs.version }}"
