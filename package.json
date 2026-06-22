@@ -1,6 +1,6 @@
 {
   "name": "olostep",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Node.js SDK for the Olostep web data API: scrape, crawl, batch, map, search, AI answers, and scheduled monitors.",
   "license": "MIT",
   "type": "module",

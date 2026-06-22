@@ -186,6 +186,39 @@ for (const link of search.links) {
 const fetched = await client.searches.get(search.id);
 ```
 
+### Monitors
+
+Watch a page or a query on a schedule and get notified when something changes. A monitor provisions in the background and runs on its own:
+
+```ts
+const monitor = await client.monitors.create({
+  query: 'Alert me when the Stripe status page reports an incident',
+  frequency: 'every 30 minutes',
+  notification: {
+    channels: [{type: 'email', target: 'you@example.com'}]
+  }
+});
+
+console.log(monitor.id, monitor.status); // monitor_..., "provisioning"
+```
+
+Read, pause, resume, and list your monitors:
+
+```ts
+const info = await client.monitors.get(monitor.id);
+const all = await client.monitors.list();
+
+await client.monitors.pause(monitor.id);
+await client.monitors.resume(monitor.id);
+```
+
+Review the change history, then delete when you are done:
+
+```ts
+const events = await client.monitors.events(monitor.id);
+await client.monitors.delete(monitor.id);
+```
+
 ### Content Retrieval
 
 Retrieve previously scraped content:
