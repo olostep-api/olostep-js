@@ -24,7 +24,7 @@ import {RequestMetadata, ResponseMetadata} from '../errors.js';
 export type QueryValue = string | number | boolean | undefined | Array<string | number | boolean>;
 
 export interface HttpRequest<TBody = unknown> {
-  method: 'GET' | 'POST';
+  method: 'GET' | 'POST' | 'DELETE';
   path: string;
   query?: Record<string, QueryValue>;
   headers?: HeadersInit;
