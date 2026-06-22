@@ -69,6 +69,29 @@ export interface ScrollAction {
 
 export type Action = WaitAction | FillInputAction | ClickAction | ScrollAction;
 
+export type ScrapeStorageExpiresIn =
+  | '7d'
+  | '10d'
+  | '30d'
+  | '60d'
+  | '90d'
+  | '180d'
+  | '365d'
+  | 'never';
+
+/**
+ * Storage retention config for a scrape.
+ * Controls how long Olostep keeps the scraped content on S3.
+ * Defaults to `"7d"` when omitted.
+ */
+export interface ScrapeStorageOptions {
+  /**
+   * Retention duration. One of: `"7d"`, `"10d"`, `"30d"`, `"60d"`,
+   * `"90d"`, `"180d"`, `"365d"`, `"never"`.
+   */
+  expiresIn: ScrapeStorageExpiresIn;
+}
+
 interface ScrapeRequestBase {
   url: string;
   formats?: Format | Format[] | string | string[];
@@ -84,6 +107,8 @@ interface ScrapeRequestBase {
   llmExtract?: LLMExtractOptions;
   linksOnPage?: LinksOnPageOptions;
   screenSize?: ScreenSize;
+  /** Storage retention config. Omit to use the default (7 days). */
+  storage?: ScrapeStorageOptions;
   metadata?: Record<string, Primitive>;
 }
 export type ScrapeRequest = FlexibleInput<ScrapeRequestBase>;
