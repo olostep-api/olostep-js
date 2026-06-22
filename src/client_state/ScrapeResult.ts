@@ -1,3 +1,8 @@
+export interface ScrapeStorageResult {
+  /** Effective retention duration. One of: `"7d"`, `"10d"`, `"30d"`, `"60d"`, `"90d"`, `"180d"`, `"365d"`, `"never"`. */
+  expires_in: string;
+}
+
 // ScrapeResult mirrors the snake_case fields returned by the Olostep API.
 export class ScrapeResult {
   public readonly id?: string;
@@ -7,6 +12,8 @@ export class ScrapeResult {
   public readonly retrieve_id?: string;
   public readonly url_to_scrape?: string;
   public readonly result?: Record<string, unknown>;
+  /** Storage retention info returned by the API. */
+  public readonly storage?: ScrapeStorageResult | null;
 
   public readonly html_content?: string;
   public readonly markdown_content?: string;
