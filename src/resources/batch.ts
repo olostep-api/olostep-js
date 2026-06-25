@@ -1,4 +1,4 @@
-import {OlostepTransport} from '../http/transport.js';
+import {OlostepTransport, QueryValue} from '../http/transport.js';
 import {BatchItem as BatchItemType, BatchRequestOptions, Format, ItemsIteratorOptions, LinksOnPageOptions, ParserRef} from '../types.js';
 import {OlostepResource} from './base.js';
 import {Batch} from '../client_state/Batch.js';
@@ -12,6 +12,37 @@ export interface BatchResponse {
   object?: string;
   created?: number;
   [key: string]: unknown;
+}
+
+export interface ScrapedStatsOptions {
+  /** Time window in hours to look back from now. Defaults to 12. Maximum 744 (31 days). */
+  window?: number;
+  /** Filter results to a specific parser ID. Omit to aggregate across all parsers. */
+  parser?: string;
+}
+
+export interface ScrapedStatsResponse {
+  object: 'batch.scraped_stats';
+  /** The requested time window in hours. */
+  window: number;
+  /** Start of the window as a Unix timestamp in milliseconds. */
+  start_time: number;
+  /** End of the window as a Unix timestamp in milliseconds. */
+  end_time: number;
+  /** Start of the window as an ISO 8601 timestamp. */
+  start_time_iso: string;
+  /** End of the window as an ISO 8601 timestamp. */
+  end_time_iso: string;
+  /** The parser filter applied, or null if none was requested. */
+  parser: string | null;
+  /** Number of batches in the window. */
+  batches: number;
+  /** Total number of URLs submitted across those batches. */
+  items: number;
+  /** Number of URLs that were successfully scraped. */
+  scraped_items: number;
+  /** Percentage of submitted URLs that were successfully scraped (0–100). */
+  scraped_pct: number;
 }
 export interface BatchItemResponse {
   id: string;
@@ -103,6 +134,18 @@ export class BatchNamespace extends OlostepResource {
     const {data} = await this.transport.request({
       method: 'GET',
       path: `/batches/${batchId}`
+    });
+    return data;
+  }
+
+  async getScrapedStats(options?: ScrapedStatsOptions): Promise<ScrapedStatsResponse> {
+    const query: Record<string, QueryValue> = {};
+    if (options?.window !== undefined) query.window = options.window;
+    if (options?.parser !== undefined) query.parser = options.parser;
+    const {data} = await this.transport.request<ScrapedStatsResponse>({
+      method: 'GET',
+      path: '/batches/stats/scraped',
+      query
     });
     return data;
   }
