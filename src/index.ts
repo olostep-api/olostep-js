@@ -27,4 +27,5 @@ export type {
 export type {OlostepClientOptions} from './config.js';
 export {normalizeToCamel} from './casing.js';
 export type {FlexibleInput} from './casing.js';
+export type {ScrapedStatsOptions, ScrapedStatsResponse} from './resources/batch.js';
 
