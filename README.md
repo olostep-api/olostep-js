@@ -277,16 +277,20 @@ const scrape2 = await client.scrapes.create({
 
 #### LLM Extraction
 
-Extract structured data using LLMs:
+Extract structured data using LLMs. `schema` is a JSON Schema with an object at the top level:
 
 ```ts
 const scrape = await client.scrapes.create({
   url: 'https://example.com',
+  formats: ['json'],
   llmExtract: {
     schema: {
-      title: 'string',
-      price: 'number',
-      description: 'string'
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        price: { type: 'number' },
+        description: { type: 'string' }
+      }
     },
     // Optionally provide a prompt to guide extraction
     prompt: 'Extract product information from this page'

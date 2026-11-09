@@ -39,6 +39,16 @@ export interface HttpResponse<TData = unknown> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Same policy as the Python SDK: transient server problems are retried, including the API's sporadic
+// "unprocessable" responses; auth, credits, blacklisted domains and missing resources fail at once.
+const isRetryable = (error: unknown) =>
+  (error instanceof OlostepServerRequestUnprocessable && !(error instanceof OlostepServerParserNotFound)) ||
+  error instanceof OlostepServerTemporaryIssue ||
+  error instanceof OlostepServerNoResultInResponse ||
+  error instanceof OlostepServerNetworkBusy ||
+  error instanceof OlostepServerInternalNetworkIssue ||
+  (error instanceof OlostepServerUnknownIssue && error.details?.response?.status === 429);
+
 const buildQueryString = (query?: HttpRequest['query']) => {
   if (!query) {
     return '';
@@ -154,8 +164,14 @@ const handleErrorResponse = (context: ErrorContext): never => {
       }
       throw new OlostepServerRequestUnprocessable(details);
     }
-    case 401:
+    case 401: {
+      // Older endpoints send {invalid_api_key: true}; newer ones send {code: "invalid_api_key"}.
+      const isInvalidKey = bodyRecord?.invalid_api_key === true || bodyRecord?.code === 'invalid_api_key';
+      if (isInvalidKey) {
+        throw new OlostepServerAuthFailed(apiKey, details);
+      }
       throw new OlostepServerBlacklistedDomain(details);
+    }
     case 402: {
       const usageLimitReached = bodyRecord?.usage_limit_reached === true;
       if (usageLimitReached) {
@@ -171,6 +187,11 @@ const handleErrorResponse = (context: ErrorContext): never => {
       throw new OlostepServerFeatureApprovalRequired(details);
     }
     case 404:
+      // Unknown method/path. The API used to answer with an AWS 403 (handled above);
+      // it now sends a 404 titled "route not found" instead of e.g. "batch not found".
+      if (bodyRecord?.title === 'route not found') {
+        throw new OlostepServerInvalidEndpointCalled(request, response);
+      }
       if (isNotEnoughResources) {
         throw new OlostepServerOutOfResources(details);
       }
@@ -209,76 +230,85 @@ export class OlostepTransport {
   ) {}
 
   async request<TData>(input: HttpRequest): Promise<HttpResponse<TData>> {
-    let attempts = 0;
-    let error: Error | undefined;
+    const url = `${this.baseUrl}${input.path}${buildQueryString(input.query)}`;
 
-    while (attempts <= this.retry.maxRetries) {
+    for (let attempt = 0; ; attempt += 1) {
+      const isLastAttempt = attempt >= this.retry.maxRetries;
+      let status: number;
+      let headers: Record<string, string>;
+      let responseText: string;
+
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
-        const url = `${this.baseUrl}${input.path}${buildQueryString(input.query)}`;
-
-        const response = await fetch(url, {
-          method: input.method,
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-            'User-Agent': this.userAgent,
-            ...input.headers
-          },
-          body: input.body ? JSON.stringify(input.body) : undefined,
-          signal: controller.signal
-        });
-
-        clearTimeout(timeout);
-
-        const responseText = await response.text();
-        const parsedBody = parseJson(responseText);
-        const headers = normalizeHeaders(response.headers);
-
-        if (!response.ok) {
-          handleErrorResponse({
-            status: response.status,
-            body: parsedBody ?? responseText,
-            rawBody: responseText,
-            headers,
-            request: toRequestMetadata(input, url),
-            apiKey: this.apiKey
+        try {
+          const response = await fetch(url, {
+            method: input.method,
+            headers: {
+              Authorization: `Bearer ${this.apiKey}`,
+              'Content-Type': 'application/json',
+              'User-Agent': this.userAgent,
+              ...input.headers
+            },
+            body: input.body ? JSON.stringify(input.body) : undefined,
+            signal: controller.signal
           });
+          status = response.status;
+          headers = normalizeHeaders(response.headers);
+          responseText = await response.text();
+        } finally {
+          clearTimeout(timeout);
         }
-
-        const data = (parsedBody ?? ({} as TData)) as TData;
-
-        return {
-          status: response.status,
-          headers,
-          data
-        };
       } catch (err) {
-        error = err as Error;
-        const isLastAttempt = attempts === this.retry.maxRetries;
-
-        if (isLastAttempt) {
-          if (error.name === 'AbortError') {
-            throw new OlostepAPIConnectionError(
-              `Request timed out calling ${input.method} ${input.path}`,
-              {cause: error}
-            );
-          }
-          const causeDetail = error?.message ? `: ${error.message}` : '';
-          throw new OlostepAPIConnectionError(
-            `Failed to reach Olostep API (${input.method} ${input.path})${causeDetail}`,
-            {cause: error}
-          );
+        // The request never got an answer (network failure or timeout): worth retrying.
+        const error = err as Error;
+        if (!isLastAttempt) {
+          await this.backoff(attempt);
+          continue;
         }
-
-        const delay = this.retry.initialDelayMs * Math.pow(2, attempts);
-        await sleep(delay);
-        attempts += 1;
+        if (error.name === 'AbortError') {
+          throw new OlostepAPIConnectionError(`Request timed out calling ${input.method} ${input.path}`, {cause: error});
+        }
+        const causeDetail = error?.message ? `: ${error.message}` : '';
+        throw new OlostepAPIConnectionError(
+          `Failed to reach Olostep API (${input.method} ${input.path})${causeDetail}`,
+          {cause: error}
+        );
       }
-    }
 
-    throw error ?? new OlostepAPIConnectionError('Unknown transport failure');
+      const parsedBody = parseJson(responseText);
+      if (status >= 200 && status < 300) {
+        return {status, headers, data: (parsedBody ?? ({} as TData)) as TData};
+      }
+
+      let apiError: unknown;
+      try {
+        handleErrorResponse({
+          status,
+          body: parsedBody ?? responseText,
+          rawBody: responseText,
+          headers,
+          request: toRequestMetadata(input, url),
+          apiKey: this.apiKey
+        });
+      } catch (err) {
+        apiError = err;
+      }
+      if (isRetryable(apiError) && !isLastAttempt) {
+        await this.backoff(attempt);
+        continue;
+      }
+      // Kept wrapped in OlostepAPIConnectionError (with the specific error in details.cause) so existing
+      // catch blocks keep working; the message now says the API answered instead of "Failed to reach".
+      const reason = apiError instanceof Error ? apiError.message : String(apiError);
+      throw new OlostepAPIConnectionError(`Olostep API request failed (${input.method} ${input.path}): ${reason}`, {
+        cause: apiError
+      });
+    }
+  }
+
+  private backoff(attempt: number) {
+    return sleep(this.retry.initialDelayMs * Math.pow(2, attempt));
   }
 }
 

@@ -31,15 +31,15 @@ const serialize = (value: unknown) => {
   }
 };
 
+// Shows only the last 4 characters, so error messages and logs never carry a usable part of the key.
 const maskApiKey = (apiKey?: string | null) => {
   if (!apiKey) {
     return '';
   }
-  const half = Math.floor(apiKey.length / 2);
-  if (half <= 0) {
+  if (apiKey.length < 12) {
     return '[*****]';
   }
-  return `[${apiKey.slice(0, half)}*****]`;
+  return `[*****${apiKey.slice(-4)}]`;
 };
 
 export class OlostepBaseError extends Error {
@@ -97,7 +97,7 @@ export class OlostepServerFeatureApprovalRequired extends OlostepServerError {
 export class OlostepServerAuthFailed extends OlostepServerError {
   constructor(apiKey?: string | null, details?: ErrorDetails) {
     const masked = maskApiKey(apiKey);
-    super(`The Olostep API rejected API key ${masked}as invalid.`, {
+    super(`The Olostep API rejected API key ${masked} as invalid.`, {
       ...details,
       maskedApiKey: masked
     });

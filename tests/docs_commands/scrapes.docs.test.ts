@@ -56,16 +56,20 @@ describe('Scrapes Feature Docs Commands', () => {
       url: 'https://www.berklee.edu/events/stefano-marchese-friends',
       formats: ['markdown', 'json'],
       llmExtract: {
+        // The API requires a JSON Schema object at the top level.
         schema: {
-          event: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              date: { type: 'string' },
-              description: { type: 'string' },
-              venue: { type: 'string' },
-              address: { type: 'string' },
-              start_time: { type: 'string' },
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                title: { type: 'string' },
+                date: { type: 'string' },
+                description: { type: 'string' },
+                venue: { type: 'string' },
+                address: { type: 'string' },
+                start_time: { type: 'string' },
+              },
             },
           },
         },

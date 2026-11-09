@@ -1,3 +1,5 @@
+import {createRequire} from 'node:module';
+
 import {FlexibleInput, normalizeToCamel} from './casing.js';
 
 interface RetryOptionsBase {
@@ -18,7 +20,16 @@ interface OlostepClientOptionsBase {
 }
 export type OlostepClientOptions = FlexibleInput<OlostepClientOptionsBase>;
 
-export const SDK_VERSION = process.env.npm_package_version ?? '0.1.0';
+// Read from the SDK's own package.json. npm_package_version belongs to whichever app is running.
+// A bundler can move the file away from package.json, so a failed read must not break the import.
+const readSdkVersion = (): string => {
+  try {
+    return createRequire(import.meta.url)('../package.json').version;
+  } catch {
+    return 'unknown';
+  }
+};
+export const SDK_VERSION = readSdkVersion();
 
 const envBaseUrl = process.env.OLOSTEP_BASE_API_URL;
 export const DEFAULT_BASE_URL = envBaseUrl && envBaseUrl.trim().length > 0 ? envBaseUrl.trim() : 'https://api.olostep.com/v1';
