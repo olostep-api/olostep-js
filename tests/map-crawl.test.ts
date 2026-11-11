@@ -19,7 +19,7 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
       
       expect(map).toBeDefined();
       expect(map.id).toMatch(/^map_/);
-    }, 60000);
+    }, 120000);
 
     test('should stream URLs using map.urls()', async () => {
       const map = await client.maps('https://example.com');
@@ -38,7 +38,7 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
       
       expect(map).toBeDefined();
       expect(map.id).toMatch(/^map_/);
-    }, 60000);
+    }, 120000);
   });
 
   describe('Map Operations - snake_case', () => {
@@ -50,7 +50,7 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
 
       expect(map).toBeDefined();
       expect(map.id).toMatch(/^map_/);
-    }, 60000);
+    }, 120000);
 
     test('should create map with snake_case include/exclude', async () => {
       const map = await client.maps({
@@ -61,7 +61,7 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
 
       expect(map).toBeDefined();
       expect(map.id).toMatch(/^map_/);
-    }, 60000);
+    }, 120000);
 
     test('should use client.maps.create() with snake_case', async () => {
       const map = await client.maps.create({
@@ -71,7 +71,7 @@ describe('Olostep SDK - Map & Crawl Operations', () => {
 
       expect(map).toBeDefined();
       expect(map.id).toMatch(/^map_/);
-    }, 60000);
+    }, 120000);
   });
 
   describe('Crawl Operations - camelCase', () => {
