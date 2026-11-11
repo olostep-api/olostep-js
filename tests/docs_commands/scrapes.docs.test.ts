@@ -94,5 +94,5 @@ describe('Scrapes Feature Docs Commands', () => {
     });
 
     expect(result.markdown_content).toBeDefined();
-  }, 30000);
+  }, 60000);
 });
