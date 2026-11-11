@@ -16,7 +16,9 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
     "check:types": "tsc --noEmit",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:release": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathIgnorePatterns /node_modules/ \"tests/(map-crawl|batch)\\\\.test\\\\.ts$\" \"tests/docs_commands/(batches|crawls|maps)\\\\.docs\\\\.test\\\\.ts$\"",
+    "test:jobs": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/map-crawl.test.ts tests/batch.test.ts tests/docs_commands/batches.docs.test.ts tests/docs_commands/crawls.docs.test.ts tests/docs_commands/maps.docs.test.ts"
   },
   "keywords": [
     "olostep",
