@@ -83,13 +83,13 @@ jobs:
           git tag "v${{ steps.check.outputs.version }}"
           git push origin "v${{ steps.check.outputs.version }}"
 
-  # Map, crawl and batch live tests. They run after a release and report
-  # failures without blocking it.
+  # Map, crawl and batch live tests. They run after the release is published,
+  # so a failure here can't block it, but it still marks the job and the run
+  # as failed so slow or broken job endpoints are visible.
   job-tests:
     needs: publish
     if: needs.publish.outputs.published == 'true'
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
